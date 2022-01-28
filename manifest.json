@@ -1,0 +1,10 @@
+{
+  "name": "Sight Portal",
+  "fileName": "craft-sight-portal",
+  "author" : "Dharam Kapila",
+  "authorEmail" : "dharam@hey.com",
+  "description" : "A Craft Extension to explore and search your documents",
+  "id": "com.craft.sightportal",
+  "api": "0.0.4",
+  "main": "index.html"
+}
