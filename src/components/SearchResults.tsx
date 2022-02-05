@@ -100,6 +100,14 @@ const SearchResults = () => {
     (state: PortalMainStore) => state.setShowMainPageResults,
   );
 
+  const setShowSubPageResults = usePortalStore(
+    (state: PortalMainStore) => state.setShowSubpageResults,
+  );
+
+  const setShowStarredBlockResults = usePortalStore(
+    (state: PortalMainStore) => state.setShowStarredBlockResults,
+  );
+
   const getCurrentInstance = useCallback(
     () => searchInstances.filter((instance) => instance.instanceId === accentColor)[0],
     [searchInstances, accentColor],
@@ -111,9 +119,7 @@ const SearchResults = () => {
     }
   };
 
-  const setShowSubPageResults = usePortalStore(
-    (state: PortalMainStore) => state.setShowSubpageResults,
-  );
+
 
   const onListScrolled = useCallback((e: React.UIEvent<HTMLElement>) => {
     if (e.currentTarget.scrollTop > 300) {
@@ -190,9 +196,9 @@ const SearchResults = () => {
           <ResultList
             results={starredResultBlocks}
             listHeader="In Saved Blocks"
-            showResults={searchPreferences.showSubPageResults}
+            showResults={searchPreferences.showStarredBlockResults}
             onHeaderClicked={() => {
-              setShowSubPageResults(!searchPreferences.showSubPageResults);
+              setShowStarredBlockResults(!searchPreferences.showStarredBlockResults);
             }}
           />
           )

@@ -4,6 +4,7 @@ import {
   CraftLink,
   DevicePlatform,
 } from '@craftdocs/craft-extension-api';
+import { boolean } from 'fp-ts';
 
 const BaseFilterOptions = t.type({
   filterApplied: t.boolean,
@@ -148,7 +149,8 @@ export type BlockSnippet = {
 export type SearchPreferences = {
   activeSearchView: ActiveSearchViewType,
   showMainPageResults: boolean,
-  showSubPageResults: boolean
+  showSubPageResults: boolean,
+  showStarredBlockResults: boolean,
 };
 
 export type PortalResultBase = {
@@ -199,6 +201,7 @@ export type PortalMainStore = PortalStore & {
   setResults: (results: PortalResultBlock[]) => void;
   setShowMainPageResults: (showResults: boolean) => void;
   setShowSubpageResults: (showResults: boolean) => void;
+  setShowStarredBlockResults: (showResults: boolean) => void;
   setResultsAcrossMultipleBlocks: (blocks: boolean) => void;
   setPlatform:(platform: DevicePlatform) => void;
   setFilterType:(instanceId: string, filterType: ActiveSearchViewType) => void;

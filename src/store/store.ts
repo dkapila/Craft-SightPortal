@@ -45,6 +45,7 @@ const usePortalStore = create<PortalMainStore>((set) => ({
     activeSearchView: 'All',
     showSubPageResults: true,
     showMainPageResults: true,
+    showStarredBlockResults: true,
   },
   setRefreshResultsPending: (resultsPending: boolean) => {
     set(() => ({
@@ -59,6 +60,11 @@ const usePortalStore = create<PortalMainStore>((set) => ({
   setPlatform: (platform: DevicePlatform) => {
     set(() => ({
       platformType: platform,
+    }));
+  },
+  setShowStarredBlockResults: (showResults: boolean) => {
+    set((state) => ({
+      searchPreferences: { ...state.searchPreferences, showStarredBlockResults: showResults },
     }));
   },
   setShowMainPageResults: (showResults: boolean) => {
