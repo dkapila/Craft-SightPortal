@@ -4,7 +4,6 @@ import {
   CraftLink,
   DevicePlatform,
 } from '@craftdocs/craft-extension-api';
-import { boolean } from 'fp-ts';
 
 const BaseFilterOptions = t.type({
   filterApplied: t.boolean,
