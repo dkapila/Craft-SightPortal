@@ -21,6 +21,7 @@ import About from './components/About';
 import getBlocks from './search/blockSearch';
 import Header from './components/Header';
 import { LOCAL_STORAGE_KEY } from './config/config';
+import FrequencyResults from './components/FrequencyResults';
 
 const GlobalStyles = createGlobalStyle`
   html, body, #react-root {
@@ -162,10 +163,16 @@ const App = () => {
                 <SearchFilter onRefreshButtonClicked={() => updateSearchResults()} />
               </StyledFilterContainer>
             )}
-        { !showHelp
+        { !showHelp && (getCurrentInstance().filters.activeViewType === 'SearchView')
             && (
               <ExtensionBodyContainer>
                 <SearchResults />
+              </ExtensionBodyContainer>
+            )}
+        { !showHelp && (getCurrentInstance().filters.activeViewType === 'FrequencyView')
+            && (
+              <ExtensionBodyContainer>
+                <FrequencyResults />
               </ExtensionBodyContainer>
             )}
         { showHelp

@@ -119,8 +119,6 @@ const SearchResults = () => {
     }
   };
 
-
-
   const onListScrolled = useCallback((e: React.UIEvent<HTMLElement>) => {
     if (e.currentTarget.scrollTop > 300) {
       setShowScrollToTopButton(true);
