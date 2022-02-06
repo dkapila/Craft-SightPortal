@@ -102,6 +102,7 @@ const TextResultBlock = ({
   const setRefreshResultsPending = usePortalStore((state) => state.setRefreshResultsPending);
   const starredBlocks = usePortalStore((state) => state.starredBlocks);
   const setStarredBlock = usePortalStore((state) => state.setStarredBlock);
+  const platformType = usePortalStore((state) => state.platformType);
   const [isInStarredBlockList, setIsInStarredBlockList] = useState(false);
 
   useEffect(() => {
@@ -126,7 +127,7 @@ const TextResultBlock = ({
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     resultBlock: PortalResultBlock,
   ) => {
-    if (e.shiftKey && resultBlock.spaceId) {
+    if ((e.shiftKey && resultBlock.spaceId) || platformType === 'Web') {
       openBlock(resultBlock.blockId);
     } else {
       navigateToBlock(resultBlock.blockId, resultBlock.spaceId);

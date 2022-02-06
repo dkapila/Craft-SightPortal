@@ -71,6 +71,7 @@ const LinkResultBlock = ({
   const setStarredBlock = usePortalStore((state) => state.setStarredBlock);
   const [isInStarredBlockList, setIsInStarredBlockList] = useState(false);
   const starredBlocks = usePortalStore((state) => state.starredBlocks);
+  const platformType = usePortalStore((state) => state.platformType);
 
   useEffect(() => {
     const inStarredBlocks = starredBlocks.some((item) => item.craftBlockId === blockResult.blockId);
@@ -94,7 +95,7 @@ const LinkResultBlock = ({
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     resultBlock: PortalResultBlock,
   ) => {
-    if (e.shiftKey && resultBlock.spaceId) {
+    if ((e.shiftKey && resultBlock.spaceId) || platformType === 'Web') {
       openBlock(resultBlock.blockId);
     } else {
       navigateToBlock(resultBlock.blockId, resultBlock.spaceId);
