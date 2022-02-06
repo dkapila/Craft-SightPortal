@@ -147,7 +147,7 @@ const Header = ({ onHeaderClicked }: HeaderProps) => {
               (navigator.onLine) && (
               <StyledIframeContainer>
                 <StyledOverlayDiv onClick={(e) => onHeaderClicked(e)} />
-                <StyledFrame frameBorder="0" title="Sight Portal Updates" src="https://sightportal.dharamkapila.repl.co/Versions/0.1betaHeader.html" />
+                <StyledFrame frameBorder="0" title="Sight Portal Updates" src="https://sightportal.dharamkapila.repl.co/Versions/0.2/0.2betaHeader.html" />
               </StyledIframeContainer>
               )
             }

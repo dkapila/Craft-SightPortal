@@ -77,7 +77,7 @@ const About = () => {
             (!iFrameLoaded) && <StyledTextDiv>Checking for updates...</StyledTextDiv>
           }
         </StyledOverlayDiv>
-        <StyledFrame frameBorder="0" onLoad={() => setIframeLoaded(true)} title="Sight Portal Updates" src="https://sightportal.dharamkapila.repl.co/Versions/0.1beta.html" />
+        <StyledFrame frameBorder="0" onLoad={() => setIframeLoaded(true)} title="Sight Portal Updates" src="https://sightportal.dharamkapila.repl.co/Versions/0.2/0.2beta.html" />
       </StyledFrameContainerDiv>
       <StyledHeader>
         Feedback
