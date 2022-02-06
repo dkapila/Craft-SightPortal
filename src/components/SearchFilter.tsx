@@ -89,7 +89,6 @@ const StyledFilterIconContainer = styled.div<FilterIconProps>`
   justify-content: center;
   margin-bottom: 5px;
   border-radius: 5px;
-  transition: background 300ms ease-in;
 
   &:hover {
     background: ${(props) => props.theme.blockHoverBackground};

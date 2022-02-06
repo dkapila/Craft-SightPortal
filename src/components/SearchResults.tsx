@@ -146,13 +146,13 @@ const SearchResults = () => {
   const [scrollButtonProps] = useSpring(() => ({
     from: { opacity: 0 },
     opacity: 1,
-    config: { duration: 400 },
+    config: { duration: 200 },
   }));
 
   const [props] = useSpring(() => ({
     from: { opacity: 0 },
     opacity: 1,
-    config: { duration: 400 },
+    config: { duration: 200 },
   }));
 
   return (

@@ -59,7 +59,7 @@ const About = () => {
   const [props] = useSpring(() => ({
     from: { opacity: 0 },
     opacity: 1,
-    config: { duration: 400 },
+    config: { duration: 200 },
   }));
 
   return (
@@ -80,7 +80,7 @@ const About = () => {
         <StyledFrame frameBorder="0" onLoad={() => setIframeLoaded(true)} title="Sight Portal Updates" src="https://sightportal.dharamkapila.repl.co/Versions/0.2/0.2beta.html" />
       </StyledFrameContainerDiv>
       <StyledHeader>
-        Feedback
+        Feedback 👋
       </StyledHeader>
       <StyledTextDiv>
         Hi, I&apos;m
@@ -101,7 +101,7 @@ const About = () => {
         .
       </StyledTextDiv>
       <StyledHeader>
-        Tips
+        Tips 🪄
       </StyledHeader>
       <StyledTextDiv>
         1. Click on the accent color icon to switch to a new search.

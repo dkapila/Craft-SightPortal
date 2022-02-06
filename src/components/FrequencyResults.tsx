@@ -112,15 +112,24 @@ const FrequencyResults: React.FC = () => {
   const searchInstances = usePortalStore((state: PortalMainStore) => state.searchInstances);
   const accentColor = usePortalStore((state: PortalMainStore) => state.accentColor);
   const setFrequencyFilter = usePortalStore((state: PortalMainStore) => state.setFrequencyFilter);
+
   const [frequencyData, setFrequencyData] = useState<FrequencyResult []>([]);
   const [props] = useSpring(() => ({
     from: { opacity: 0 },
     opacity: 1,
-    config: { duration: 400 },
+    config: { duration: 200 },
   }));
 
   const getCurrentInstance = useCallback(() => searchInstances.filter((instance) => instance
     .instanceId === accentColor)[0], [searchInstances, accentColor]);
+
+  const [includeSubpageSwitch, setIncludeSubpageSwitch] = useState(
+    getCurrentInstance().filters.frequencyFilter.includeSubPages,
+  );
+
+  const [includeStopwordsSwitch, setIncludeStopwordsSwitch] = useState(
+    getCurrentInstance().filters.frequencyFilter.includeStopWords,
+  );
 
   useEffect(() => {
     const { frequencyFilter } = getCurrentInstance().filters;
@@ -187,29 +196,37 @@ const FrequencyResults: React.FC = () => {
   }, [searchInstances, accentColor]);
 
   const onIncludeStopwordsSwitchToggled = useCallback((isEnabled: boolean) => {
-    const { frequencyFilter } = getCurrentInstance().filters;
-    frequencyFilter.includeStopWords = isEnabled;
+    setIncludeStopwordsSwitch(isEnabled);
 
-    setFrequencyFilter(getCurrentInstance().instanceId, frequencyFilter);
+    setTimeout(() => {
+      const { frequencyFilter } = getCurrentInstance().filters;
+      frequencyFilter.includeStopWords = isEnabled;
+
+      setFrequencyFilter(getCurrentInstance().instanceId, frequencyFilter);
+    }, 300);
   }, [searchInstances, accentColor]);
 
   const onIncludeSubpagesSwitchToggled = useCallback((isEnabled: boolean) => {
-    const { frequencyFilter } = getCurrentInstance().filters;
-    frequencyFilter.includeSubPages = isEnabled;
+    setIncludeSubpageSwitch(isEnabled);
 
-    setFrequencyFilter(getCurrentInstance().instanceId, frequencyFilter);
+    setTimeout(() => {
+      const { frequencyFilter } = getCurrentInstance().filters;
+      frequencyFilter.includeSubPages = isEnabled;
+
+      setFrequencyFilter(getCurrentInstance().instanceId, frequencyFilter);
+    }, 300);
   }, [searchInstances, accentColor]);
 
   return (
     <StyledContainer style={props}>
       <StyledHeader>
         <Switch
-          enabled={getCurrentInstance().filters.frequencyFilter.includeStopWords}
+          enabled={includeStopwordsSwitch}
           onToggled={(isEnabled) => { onIncludeStopwordsSwitchToggled(isEnabled); }}
           label="Include Common Words"
         />
         <Switch
-          enabled={getCurrentInstance().filters.frequencyFilter.includeSubPages}
+          enabled={includeSubpageSwitch}
           onToggled={(isEnabled) => { onIncludeSubpagesSwitchToggled(isEnabled); }}
           label="Include Subpages"
         />
