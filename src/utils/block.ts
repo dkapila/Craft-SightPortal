@@ -36,6 +36,7 @@ export const parseBlocks = (
       textStyleType: (block as CraftTextBlock).style.textStyle,
       listStyleType: listType,
       id: uuidv4(),
+      spaceId: block.spaceId ? block.spaceId : '',
       fullString: getBlockString(block),
       craftBlock: block,
       ...{ level },
@@ -54,6 +55,10 @@ export const parseBlocks = (
   }
 
   return traversed_block_list;
+};
+
+export const navigateToBlock = (blockId: string, spaceId: string) => {
+  CraftAPIHelper.openUrl(`craftdocs://open?blockId=${blockId}&spaceId=${spaceId}`);
 };
 
 export const getRandomBlock: () => Promise<PortalBlockType | null> = async () => {

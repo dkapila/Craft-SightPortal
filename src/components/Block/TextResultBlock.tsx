@@ -4,7 +4,7 @@ import { TextStyle } from '@craftdocs/craft-extension-api';
 import usePortalStore from '../../store/store';
 import { PortalTextResult, PortalResultBlock } from '../../Types';
 import CraftAPIHelper from '../../api/craftAPIHelper';
-import { parseBlocks } from '../../utils/block';
+import { navigateToBlock, parseBlocks } from '../../utils/block';
 import ToggleStar from './Actions/ToggleStar';
 
 type TextSpanProps = {
@@ -122,14 +122,21 @@ const TextResultBlock = ({
     }
   }, [isInStarredBlockList]);
 
-  const onBlockLinkClicked = async (resultBlock: PortalResultBlock) => {
-    openBlock(resultBlock.blockId);
+  const onBlockLinkClicked = async (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    resultBlock: PortalResultBlock,
+  ) => {
+    if (e.shiftKey && resultBlock.spaceId) {
+      openBlock(resultBlock.blockId);
+    } else {
+      navigateToBlock(resultBlock.blockId, resultBlock.spaceId);
+    }
     setRefreshResultsPending(true);
   };
 
   return (
     <StyledResultsContainer
-      onClick={() => onBlockLinkClicked(blockResult)}
+      onClick={(e) => onBlockLinkClicked(e, blockResult)}
     >
       <StyledTextSpan
         enableDynamicTextSize={enableDynamicTextSize}

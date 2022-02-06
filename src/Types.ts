@@ -150,6 +150,7 @@ export type StyledListType = t.TypeOf<typeof StyledList>;
 export const PortalBlock = t.type({
   id: t.string,
   parentId: t.string,
+  spaceId: t.string,
   level: t.number,
   fullString: t.string,
   textStyleType: StyledText,
@@ -189,6 +190,7 @@ export type PortalResultBase = {
   level: number,
   parentId: string,
   blockId: string,
+  spaceId: string,
   portalBlock: PortalBlockType,
 };
 

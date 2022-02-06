@@ -111,6 +111,9 @@ const About = () => {
         For example, searching for **serentipity** will search for the word serendipity in bold.
         Similarly, you can use :: to search for highlights, or # for all headings.
       </StyledTextDiv>
+      <StyledTextDiv>
+        3. Shift + Click on a result to navigate inside the block and make it the current page.
+      </StyledTextDiv>
       <LabView />
     </StyledContainer>
   );

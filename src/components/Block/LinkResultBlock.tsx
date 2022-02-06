@@ -5,7 +5,7 @@ import usePortalStore from '../../store/store';
 import { PortalLinkResult, PortalResultBlock } from '../../Types';
 import CraftAPIHelper from '../../api/craftAPIHelper';
 import ToggleStar from './Actions/ToggleStar';
-import { parseBlocks } from '../../utils/block';
+import { navigateToBlock, parseBlocks } from '../../utils/block';
 
 const StyledTextContainer = styled.div`
   flex-grow: 1.1;
@@ -90,8 +90,15 @@ const LinkResultBlock = ({
     }
   }, [isInStarredBlockList, starredBlocks]);
 
-  const onBlockLinkClicked = async (resultBlock: PortalResultBlock) => {
-    openBlock(resultBlock.blockId);
+  const onBlockLinkClicked = async (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    resultBlock: PortalResultBlock,
+  ) => {
+    if (e.shiftKey && resultBlock.spaceId) {
+      openBlock(resultBlock.blockId);
+    } else {
+      navigateToBlock(resultBlock.blockId, resultBlock.spaceId);
+    }
     setRefreshResultsPending(true);
   };
 
@@ -130,7 +137,7 @@ const LinkResultBlock = ({
   };
 
   return (
-    <StyledResultsContainer onClick={() => onBlockLinkClicked(blockResult)}>
+    <StyledResultsContainer onClick={(e) => onBlockLinkClicked(e, blockResult)}>
       <StyledTextContainer>
         <StyledTextSpan>
           { (blockResult as PortalLinkResult).preText }

@@ -18,6 +18,7 @@ class LinkResultsConverter {
         if (item.link) {
           results.push({
             portalBlock: block,
+            spaceId: block.spaceId,
             id: block.id,
             type: 'PortalLinkResult',
             parentId: block.parentId,
