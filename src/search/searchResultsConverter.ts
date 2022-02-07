@@ -16,6 +16,7 @@ class SearchResultsConverter {
 
       results.push({
         portalBlock: block,
+        spaceId: block.spaceId,
         id: block.id,
         type: 'PortalTextResult',
         textStyleType: block.textStyleType,

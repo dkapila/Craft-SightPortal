@@ -56,8 +56,41 @@ const ActiveSearchView = t.keyof({
 
 export type ActiveSearchViewType = t.TypeOf<typeof ActiveSearchView>;
 
+const ActiveView = t.keyof({
+  SearchView: null, FrequencyView: null,
+});
+
+export type ActiveViewType = t.TypeOf<typeof ActiveView>;
+
+const SortOrder = t.keyof({
+  None: null, Ascending: null, Descending: null,
+});
+
+const FrequencyColumnName = t.keyof({
+  word: null,
+  length: null,
+  frequency: null,
+});
+
+export type FrequencyColumnNameType = t.TypeOf<typeof FrequencyColumnName>;
+
+const FrequencyColumn = t.type({
+  sortOrder: SortOrder,
+  type: FrequencyColumnName,
+});
+
+const FrequencyFilter = t.type({
+  includeSubPages: t.boolean,
+  includeStopWords: t.boolean,
+  frequencyColumns: t.array(FrequencyColumn),
+});
+
+export type FrequencyFilterType = t.TypeOf<typeof FrequencyFilter>;
+
 const SearchFilterRequired = t.type({
   activeSearchViewType: ActiveSearchView,
+  activeViewType: ActiveView,
+  frequencyFilter: FrequencyFilter,
 });
 
 const SearchFiltersOptional = t.partial({
@@ -117,6 +150,7 @@ export type StyledListType = t.TypeOf<typeof StyledList>;
 export const PortalBlock = t.type({
   id: t.string,
   parentId: t.string,
+  spaceId: t.string,
   level: t.number,
   fullString: t.string,
   textStyleType: StyledText,
@@ -146,9 +180,9 @@ export type BlockSnippet = {
 };
 
 export type SearchPreferences = {
-  activeSearchView: ActiveSearchViewType,
   showMainPageResults: boolean,
-  showSubPageResults: boolean
+  showSubPageResults: boolean,
+  showStarredBlockResults: boolean,
 };
 
 export type PortalResultBase = {
@@ -156,6 +190,7 @@ export type PortalResultBase = {
   level: number,
   parentId: string,
   blockId: string,
+  spaceId: string,
   portalBlock: PortalBlockType,
 };
 
@@ -193,20 +228,30 @@ export type PortalStore = {
   refreshResultsPending: boolean
 };
 
+export type FrequencyResult = {
+  word: string,
+  length: number,
+  frequency: number,
+  id: string,
+};
+
 export type PortalMainStore = PortalStore & {
   setRefreshResultsPending: (refreshPending: boolean) => void;
   setAccentColor: (color: AccentColorType) => void;
   setResults: (results: PortalResultBlock[]) => void;
   setShowMainPageResults: (showResults: boolean) => void;
   setShowSubpageResults: (showResults: boolean) => void;
+  setShowStarredBlockResults: (showResults: boolean) => void;
   setResultsAcrossMultipleBlocks: (blocks: boolean) => void;
   setPlatform:(platform: DevicePlatform) => void;
   setFilterType:(instanceId: string, filterType: ActiveSearchViewType) => void;
+  setView:(instanceId: string, viewType: ActiveViewType) => void;
   setSearchInstances: (instances: SearchInstanceType[]) => void;
   setTaskFilter: (instanceId: string, filterOptions: TaskFilterOptionsType) => void;
   setHeaderFilter: (instanceId: string, filterOptions: HeaderFilterOptionsType) => void;
   setLinkFilter: (instanceId: string, filterOptions: LinkFilterOptionsType) => void;
   setTextFilter: (instanceId: string, filterOptions: TextFilterOptionsType) => void;
+  setFrequencyFilter: (instanceId: string, filterOptions: FrequencyFilterType) => void;
 
   addStarredBlock: (starredBlock: PortalBlockType) => void;
   removeStarredBlock: (id: string) => void;
@@ -230,4 +275,7 @@ export type Theme = {
   inputTextBorderColor: string,
   placeholderTextColor: string,
   linkTextColor: string,
+  toggleSwitchDisabledBackground: string,
+  invertedPrimaryBackground: string,
+  invertedPrimaryTextColor: string,
 };

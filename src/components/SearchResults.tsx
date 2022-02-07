@@ -100,6 +100,14 @@ const SearchResults = () => {
     (state: PortalMainStore) => state.setShowMainPageResults,
   );
 
+  const setShowSubPageResults = usePortalStore(
+    (state: PortalMainStore) => state.setShowSubpageResults,
+  );
+
+  const setShowStarredBlockResults = usePortalStore(
+    (state: PortalMainStore) => state.setShowStarredBlockResults,
+  );
+
   const getCurrentInstance = useCallback(
     () => searchInstances.filter((instance) => instance.instanceId === accentColor)[0],
     [searchInstances, accentColor],
@@ -110,10 +118,6 @@ const SearchResults = () => {
       node.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
-
-  const setShowSubPageResults = usePortalStore(
-    (state: PortalMainStore) => state.setShowSubpageResults,
-  );
 
   const onListScrolled = useCallback((e: React.UIEvent<HTMLElement>) => {
     if (e.currentTarget.scrollTop > 300) {
@@ -142,13 +146,13 @@ const SearchResults = () => {
   const [scrollButtonProps] = useSpring(() => ({
     from: { opacity: 0 },
     opacity: 1,
-    config: { duration: 400 },
+    config: { duration: 200 },
   }));
 
   const [props] = useSpring(() => ({
     from: { opacity: 0 },
     opacity: 1,
-    config: { duration: 400 },
+    config: { duration: 200 },
   }));
 
   return (
@@ -190,9 +194,9 @@ const SearchResults = () => {
           <ResultList
             results={starredResultBlocks}
             listHeader="In Saved Blocks"
-            showResults={searchPreferences.showSubPageResults}
+            showResults={searchPreferences.showStarredBlockResults}
             onHeaderClicked={() => {
-              setShowSubPageResults(!searchPreferences.showSubPageResults);
+              setShowStarredBlockResults(!searchPreferences.showStarredBlockResults);
             }}
           />
           )

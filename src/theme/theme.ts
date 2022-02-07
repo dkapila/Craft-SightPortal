@@ -24,6 +24,9 @@ const LightTheme: Theme = {
   inputTextBorderColor: '#DEDEDF',
   placeholderTextColor: '#BDBDBD',
   linkTextColor: '#0F5392',
+  toggleSwitchDisabledBackground: '#D9D8DA',
+  invertedPrimaryBackground: '#57585C',
+  invertedPrimaryTextColor: '#FFFFFF',
 };
 
 const DarkTheme: Theme = {
@@ -43,6 +46,9 @@ const DarkTheme: Theme = {
   inputTextBorderColor: '#404140',
   placeholderTextColor: '#585959',
   linkTextColor: '#8FDEF9',
+  toggleSwitchDisabledBackground: '#3F3F42',
+  invertedPrimaryBackground: '#C9C9C9',
+  invertedPrimaryTextColor: '#262727',
 };
 
 export const LightYellowTheme: Theme = {

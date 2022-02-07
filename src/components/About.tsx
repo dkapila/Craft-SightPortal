@@ -59,7 +59,7 @@ const About = () => {
   const [props] = useSpring(() => ({
     from: { opacity: 0 },
     opacity: 1,
-    config: { duration: 400 },
+    config: { duration: 200 },
   }));
 
   return (
@@ -77,10 +77,10 @@ const About = () => {
             (!iFrameLoaded) && <StyledTextDiv>Checking for updates...</StyledTextDiv>
           }
         </StyledOverlayDiv>
-        <StyledFrame frameBorder="0" onLoad={() => setIframeLoaded(true)} title="Sight Portal Updates" src="https://sightportal.dharamkapila.repl.co/Versions/0.1beta.html" />
+        <StyledFrame frameBorder="0" onLoad={() => setIframeLoaded(true)} title="Sight Portal Updates" src="https://sightportal.dharamkapila.repl.co/Versions/0.2/0.2beta.html" />
       </StyledFrameContainerDiv>
       <StyledHeader>
-        Feedback
+        Feedback 👋
       </StyledHeader>
       <StyledTextDiv>
         Hi, I&apos;m
@@ -101,7 +101,7 @@ const About = () => {
         .
       </StyledTextDiv>
       <StyledHeader>
-        Tips
+        Tips 🪄
       </StyledHeader>
       <StyledTextDiv>
         1. Click on the accent color icon to switch to a new search.
@@ -110,6 +110,9 @@ const About = () => {
         2. You can use common markdown syntax while searching for blocks.
         For example, searching for **serentipity** will search for the word serendipity in bold.
         Similarly, you can use :: to search for highlights, or # for all headings.
+      </StyledTextDiv>
+      <StyledTextDiv>
+        3. Shift + Click on a result to navigate inside the block and make it the current page.
       </StyledTextDiv>
       <LabView />
     </StyledContainer>

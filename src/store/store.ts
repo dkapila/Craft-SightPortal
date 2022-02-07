@@ -13,6 +13,8 @@ import {
   AccentColorType,
   HeaderFilterOptionsType,
   PortalBlockType,
+  ActiveViewType,
+  FrequencyFilterType,
 } from '../Types';
 
 const usePortalStore = create<PortalMainStore>((set) => ({
@@ -42,9 +44,9 @@ const usePortalStore = create<PortalMainStore>((set) => ({
     }));
   },
   searchPreferences: {
-    activeSearchView: 'All',
     showSubPageResults: true,
     showMainPageResults: true,
+    showStarredBlockResults: true,
   },
   setRefreshResultsPending: (resultsPending: boolean) => {
     set(() => ({
@@ -61,6 +63,11 @@ const usePortalStore = create<PortalMainStore>((set) => ({
       platformType: platform,
     }));
   },
+  setShowStarredBlockResults: (showResults: boolean) => {
+    set((state) => ({
+      searchPreferences: { ...state.searchPreferences, showStarredBlockResults: showResults },
+    }));
+  },
   setShowMainPageResults: (showResults: boolean) => {
     set((state) => ({
       searchPreferences: { ...state.searchPreferences, showMainPageResults: showResults },
@@ -74,6 +81,23 @@ const usePortalStore = create<PortalMainStore>((set) => ({
   setShowSubpageResults: (showResults: boolean) => {
     set((state) => ({
       searchPreferences: { ...state.searchPreferences, showSubPageResults: showResults },
+    }));
+  },
+  setView: (instanceId: string, viewType: ActiveViewType) => {
+    set((state) => ({
+      searchInstances: state.searchInstances.map((instance) => {
+        if (!(instance.instanceId === instanceId)) {
+          return instance;
+        }
+
+        return {
+          ...instance,
+          filters: {
+            ...instance.filters,
+            activeViewType: viewType,
+          },
+        };
+      }),
     }));
   },
   setFilterType: (instanceId: string, filterType: ActiveSearchViewType) => {
@@ -186,6 +210,23 @@ const usePortalStore = create<PortalMainStore>((set) => ({
           filters: {
             ...instance.filters,
             textFilter: filterOptions,
+          },
+        };
+      }),
+    }));
+  },
+  setFrequencyFilter: (instanceId: string, filterOptions: FrequencyFilterType) => {
+    set((state) => ({
+      searchInstances: state.searchInstances.map((instance) => {
+        if (!(instance.instanceId === instanceId)) {
+          return instance;
+        }
+
+        return {
+          ...instance,
+          filters: {
+            ...instance.filters,
+            frequencyFilter: filterOptions,
           },
         };
       }),

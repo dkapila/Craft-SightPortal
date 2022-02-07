@@ -15,6 +15,7 @@ type IProps = {
 const StyledFilterTextBoxContainer = styled.div`
   display: flex;
   flex-grow: 1.1;
+  align-items: center;
   flex-direction: row;
   position: relative;
   padding-bottom: 5px;
@@ -24,7 +25,7 @@ const StyledFilterTextBoxContainer = styled.div`
 
 export const StyledFilterIcon = styled(FontAwesomeIcon)<IProps>`
   color: ${(props) => props.theme.iconColor};
-  width: 19px;
+  height 14px;
   transition: color 200ms ease-in;
 
   ${({ $showRefreshPending, theme }) => $showRefreshPending && `
@@ -40,8 +41,10 @@ const StyledFilterIconContainer = styled.div<FilterIconProps>`
   align-items: center;
   cursor: ${(props) => (props.isWeb ? 'pointer' : 'default')};
   display: flex;
-  width: 40px;
+  width: 30px;
+  height:28px;
   justify-content: center;
+  border-radius: 5px;
 
   &:hover {
     background: ${(props) => props.theme.blockHoverBackground};

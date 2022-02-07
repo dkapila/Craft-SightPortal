@@ -21,6 +21,7 @@ import About from './components/About';
 import getBlocks from './search/blockSearch';
 import Header from './components/Header';
 import { LOCAL_STORAGE_KEY } from './config/config';
+import FrequencyResults from './components/FrequencyResults';
 
 const GlobalStyles = createGlobalStyle`
   html, body, #react-root {
@@ -107,7 +108,6 @@ const App = () => {
   const getDataFromStorage = useCallback(() => {
     const onExtensionLoaded = async () => {
       const response = await CraftAPIHelper.getFromSession(LOCAL_STORAGE_KEY);
-      setSessionDataLoaded(true);
       if (response.status === 'success') {
         const data: SessionDataType = JSON.parse(response.data);
         const decoded: E.Either<T.Errors, SessionDataType> = SessionData.decode(data);
@@ -115,11 +115,16 @@ const App = () => {
           setSearchInstances(data.searchInstances);
           setAccentColor(data.accentColor);
           setStarredBlocks(data.starredBlocks);
+          setSessionDataLoaded(true);
         }
+      } else {
+        setSessionDataLoaded(true);
       }
     };
 
-    onExtensionLoaded();
+    window.setTimeout(() => {
+      onExtensionLoaded();
+    }, 50);
   }, []);
 
   const getCurrentInstance = useCallback(
@@ -150,31 +155,41 @@ const App = () => {
   const extensionContent = (
     <ThemeProvider theme={theme as Theme}>
       <GlobalStyles />
-      <ExtensionContainer>
-        <Header onHeaderClicked={(e) => {
-          e.stopPropagation();
-          setShowHelp((state) => !state);
-        }}
-        />
-        { !showHelp
-            && (
-              <StyledFilterContainer>
-                <SearchFilter onRefreshButtonClicked={() => updateSearchResults()} />
-              </StyledFilterContainer>
-            )}
-        { !showHelp
-            && (
-              <ExtensionBodyContainer>
-                <SearchResults />
-              </ExtensionBodyContainer>
-            )}
-        { showHelp
-            && (
-              <ExtensionBodyContainer>
-                <About />
-              </ExtensionBodyContainer>
-            )}
-      </ExtensionContainer>
+      {
+        (sessionDataLoaded) && (
+          <ExtensionContainer>
+            <Header onHeaderClicked={(e) => {
+              e.stopPropagation();
+              setShowHelp((state) => !state);
+            }}
+            />
+            { !showHelp
+              && (
+                <StyledFilterContainer>
+                  <SearchFilter onRefreshButtonClicked={() => updateSearchResults()} />
+                </StyledFilterContainer>
+              )}
+            { !showHelp && (getCurrentInstance().filters.activeViewType === 'SearchView')
+              && (
+                <ExtensionBodyContainer>
+                  <SearchResults />
+                </ExtensionBodyContainer>
+              )}
+            { !showHelp && (getCurrentInstance().filters.activeViewType === 'FrequencyView')
+              && (
+                <ExtensionBodyContainer>
+                  <FrequencyResults />
+                </ExtensionBodyContainer>
+              )}
+            { showHelp
+              && (
+                <ExtensionBodyContainer>
+                  <About />
+                </ExtensionBodyContainer>
+              )}
+          </ExtensionContainer>
+        )
+      }
     </ThemeProvider>
   );
 

@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
-import { faRedo } from '@fortawesome/free-solid-svg-icons';
+import { faRedo, faTable } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import FilterButton from './Button/FilterButton';
 import FilterTextBox from './TextBox/FilterTextBox';
 import usePortalStore from '../store/store';
-import { PortalMainStore } from '../Types';
+import { ActiveViewType, PortalMainStore } from '../Types';
 
 const StyledSearchFilter = styled.div`
   .portal-card-settings-enter {
@@ -44,7 +44,7 @@ const StyledFilterParentOptions = styled.div`
   width: 100%;
   justify-content: center;
   padding-top: 2px;
-  gap: 5px;
+  gap: 2px;
   padding-bottom: 5px;
 `;
 
@@ -60,7 +60,47 @@ const StyledFilterTextBox = styled(FilterTextBox)`
 
 const StyledFilterTextContainer = styled.div`
   display: flex;
+  align-items: center;
   gap: 5px;
+`;
+
+export const StyledFilterIcon = styled(FontAwesomeIcon)<FilterIconProps>`
+  color: ${(props) => props.theme.iconColor};
+  height: 14px;
+  transition: color 200ms ease-in;
+
+  ${({ $isActive, theme }) => $isActive && `
+    height: 16px;
+    color: ${theme.invertedPrimaryTextColor};
+  `}
+`;
+
+type FilterIconProps = {
+  $isWeb: boolean;
+  $isActive: boolean,
+};
+
+const StyledFilterIconContainer = styled.div<FilterIconProps>`
+  align-items: center;
+  cursor: ${(props) => (props.$isWeb ? 'pointer' : 'default')};
+  display: flex;
+  width: 30px;
+  height: 28px;
+  justify-content: center;
+  margin-bottom: 5px;
+  border-radius: 5px;
+
+  &:hover {
+    background: ${(props) => props.theme.blockHoverBackground};
+  }
+
+  ${({ $isActive, theme }) => $isActive && `
+    background: ${theme.invertedPrimaryBackground};
+
+    &:hover {
+      background: ${theme.invertedPrimaryBackground};
+    }
+  `}
 `;
 
 type SearchFilterProps = {
@@ -69,6 +109,7 @@ type SearchFilterProps = {
 
 const SearchFilter = ({ onRefreshButtonClicked }: SearchFilterProps) => {
   const refreshResultsPending = usePortalStore((state) => state.refreshResultsPending);
+  const platformType = usePortalStore((state) => state.platformType);
   const searchPreferences = usePortalStore((state: PortalMainStore) => state.searchPreferences);
   const searchInstances = usePortalStore((state: PortalMainStore) => state.searchInstances);
   const accentColor = usePortalStore((state: PortalMainStore) => state.accentColor);
@@ -78,6 +119,7 @@ const SearchFilter = ({ onRefreshButtonClicked }: SearchFilterProps) => {
   const setLinkFilter = usePortalStore((state: PortalMainStore) => state.setLinkFilter);
   const [filterText, setFilterText] = useState('');
   const setFilterType = usePortalStore((state: PortalMainStore) => state.setFilterType);
+  const setView = usePortalStore((state: PortalMainStore) => state.setView);
 
   const getCurrentInstance = useCallback(() => searchInstances.filter((instance) => instance
     .instanceId === accentColor)[0], [searchInstances, accentColor]);
@@ -136,6 +178,11 @@ const SearchFilter = ({ onRefreshButtonClicked }: SearchFilterProps) => {
     setFilterType(instance.instanceId, 'Headers');
   }, [searchPreferences, searchInstances, accentColor]);
 
+  const onTableViewClicked = useCallback(() => {
+    const newView : ActiveViewType = getCurrentInstance().filters.activeViewType === 'SearchView' ? 'FrequencyView' : 'SearchView';
+    setView(getCurrentInstance().instanceId, newView);
+  }, [searchInstances, accentColor]);
+
   const showTaskFilters = useCallback(() => {
     const instance = getCurrentInstance();
     resetFilters();
@@ -175,6 +222,13 @@ const SearchFilter = ({ onRefreshButtonClicked }: SearchFilterProps) => {
           onTextChange={(newString) => onFilterTextChanged(newString)}
           placeHolder="Filter Results"
         />
+        <StyledFilterIconContainer $isActive={getCurrentInstance().filters.activeViewType === 'FrequencyView'} $isWeb={platformType === 'Web'} onClick={() => onTableViewClicked()}>
+          <StyledFilterIcon
+            $isActive={getCurrentInstance().filters.activeViewType === 'FrequencyView'}
+            $isWeb={platformType === 'Web'}
+            icon={faTable}
+          />
+        </StyledFilterIconContainer>
       </StyledFilterTextContainer>
       <StyledFilterParentOptions>
         <FilterButton isActive={getCurrentInstance().filters.activeSearchViewType === 'All'} onClick={() => { resetFilters(); }} label="All" />

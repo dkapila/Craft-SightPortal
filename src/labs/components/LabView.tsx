@@ -26,7 +26,7 @@ const StyledTextDiv = styled.div`
 const LabView = () => (
   <StyledLabsContainer>
     <StyledHeader>
-      Labs
+      Labs 🧪
     </StyledHeader>
     <StyledTextDiv>
       These are experimental features, and may change.
