@@ -1,6 +1,6 @@
 {
   "name": "craft-sight-portal",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A Craft Extension to search and explore your documents",
   "main": "index.ts",
   "scripts": {
@@ -48,7 +48,6 @@
     "@fortawesome/react-fontawesome": "^0.1.16",
     "@react-spring/web": "^9.4.2",
     "fp-ts": "^2.11.8",
-    "i": "^0.3.7",
     "io-ts": "^2.2.16",
     "lodash.debounce": "^4.0.8",
     "nanoid": "^3.1.30",
