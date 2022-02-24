@@ -27,6 +27,7 @@ const LightTheme: Theme = {
   toggleSwitchDisabledBackground: '#D9D8DA',
   invertedPrimaryBackground: '#57585C',
   invertedPrimaryTextColor: '#FFFFFF',
+  videoBackground: '#F4F9FF',
 };
 
 const DarkTheme: Theme = {
@@ -49,78 +50,91 @@ const DarkTheme: Theme = {
   toggleSwitchDisabledBackground: '#3F3F42',
   invertedPrimaryBackground: '#C9C9C9',
   invertedPrimaryTextColor: '#262727',
+  videoBackground: '#',
 };
 
 export const LightYellowTheme: Theme = {
   ...LightTheme,
   accentColor: '#E4C010',
   linkTextColor: '#82701A',
+  videoBackground: '#FEFCF5',
 };
 
 export const LightPurpleTheme: Theme = {
   ...LightTheme,
   accentColor: '#5E02D2',
   linkTextColor: '#3E127B',
+  videoBackground: '#F8F3FE',
 };
 
 export const LightGreenTheme: Theme = {
   ...LightTheme,
   accentColor: '#00C2A6',
   linkTextColor: '#0F7165',
+  videoBackground: '#F6FCFA',
 };
 
 export const LightPinkTheme: Theme = {
   ...LightTheme,
   accentColor: '#D6179B',
   linkTextColor: '#7A1C5F',
+  videoBackground: '#FEF5FA',
 };
 
 export const LightBlueTheme: Theme = {
   ...LightTheme,
   accentColor: '#0086FF',
   linkTextColor: '#0E5493',
+  videoBackground: '#F4F9FF',
 };
 
 export const LightGreyTheme: Theme = {
   ...LightTheme,
   accentColor: '#8D8E93',
   linkTextColor: '#383F46',
+  videoBackground: '#F9F8FA',
 };
 
 export const DarkBlueTheme: Theme = {
   ...DarkTheme,
   accentColor: '#2EC8FF',
   linkTextColor: '#91DEFA',
+  videoBackground: '#242A2D',
 };
 
 export const DarkPurpleTheme: Theme = {
   ...DarkTheme,
   accentColor: '#BF8BFF',
   linkTextColor: '#D8BEF9',
+  videoBackground: '#2B272D',
 };
 
 export const DarkGreenTheme: Theme = {
   ...DarkTheme,
   accentColor: '#4CFFDD',
   linkTextColor: '#A0F9E9',
+  videoBackground: '#262D2B',
 };
 
 export const DarkPinkTheme: Theme = {
   ...DarkTheme,
   accentColor: '#FF6AD1',
   linkTextColor: '#F9AEE2',
+  videoBackground: '#2D262B',
 };
 
 export const DarkGreyTheme: Theme = {
   ...DarkTheme,
   accentColor: '#8D8E93',
   linkTextColor: '#D7DBDE',
+  videoBackground: '#282727',
 };
 
 export const DarkYellowTheme: Theme = {
   ...DarkTheme,
   accentColor: '#FFE97C',
   linkTextColor: '#FAEEB7',
+  videoBackground: '#2D2C26',
 };
 
 export const useTheme = () => {

@@ -1,5 +1,6 @@
 import {
   ApiResponse,
+  BlockLocation,
   CraftBlock,
   CraftBlockInsert,
   CraftTextBlock,
@@ -41,8 +42,43 @@ class CraftAPIHelper {
     return craft.editorApi.navigateToBlockId(blockId);
   }
 
-  public static async addBLocks(blocks: CraftBlockInsert[]): Promise<ApiResponse<CraftBlock[]>> {
-    return craft.dataApi.addBlocks(blocks);
+  public static async addBLocks(
+    blocks: CraftBlockInsert[],
+    location?: BlockLocation,
+  ): Promise<ApiResponse<CraftBlock[]>> {
+    return craft.dataApi.addBlocks(blocks, location);
+  }
+
+  public async getCurrentPageId(): Promise<string> {
+    const data = await this.getCurrentPageBlocks();
+    if (data.status === 'success') {
+      return data.data.id;
+    }
+
+    throw new Error('No Current Page found');
+  }
+
+  public static async selectedBlocks(blockIds: string[]) {
+    return craft.editorApi.selectBlocks(blockIds);
+  }
+
+  public static async getSelectedBlocks() {
+    return craft.editorApi.getSelection();
+  }
+
+  public async getLatestSelectedBlockLocation(): Promise<BlockLocation | null> {
+    const currentPageId = await this.getCurrentPageId();
+    const selectionRes = await CraftAPIHelper.getSelectedBlocks();
+    if (selectionRes.status === 'success' && selectionRes.data.length > 0) {
+      const blockIdToInsertAfter = selectionRes.data[selectionRes.data.length - 1].id;
+      return CraftAPIHelper.afterBlockLocation(currentPageId, blockIdToInsertAfter);
+    }
+
+    return null;
+  }
+
+  public static afterBlockLocation(currentPageId: string, blockIdToInsertAfter: string) {
+    return craft.location.afterBlockLocation(currentPageId, blockIdToInsertAfter);
   }
 
   public static openUrl(urlString: string) {

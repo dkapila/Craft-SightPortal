@@ -13,6 +13,9 @@ class SearchResultsConverter {
     this.blocks.forEach((block: PortalBlockType) => {
       const { fullString } = block;
       const resultText = (fullString.length > 250) ? `${fullString.substring(0, 250)}...` : fullString;
+      if (resultText.trim().length === 0) {
+        return;
+      }
 
       results.push({
         portalBlock: block,
