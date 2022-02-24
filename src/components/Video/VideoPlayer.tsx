@@ -10,12 +10,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { CraftTextBlockInsert } from '@craftdocs/craft-extension-api';
+import { ApiResponse, CraftBlock, CraftTextBlockInsert } from '@craftdocs/craft-extension-api';
 import CraftAPIHelper from '../../api/craftAPIHelper';
 import { PortalMainStore } from '../../Types';
 import usePortalStore from '../../store/store';
 import getFormattedTime from '../../utils/time';
 import withOpacity from '../../utils/colors';
+import { navigateToBlock } from '../../utils/block';
 
 const PlayerContainer = styled.div`
   z-index: 10;
@@ -265,6 +266,17 @@ const VideoPlayer = () => {
     }, 500);
   }, []);
 
+  const onBlockAdded = useCallback(async (response: ApiResponse<CraftBlock[]>) => {
+    if (response.status === 'success') {
+      const { id } = response.data[0];
+      const { spaceId } = response.data[0];
+      await CraftAPIHelper.selectedBlocks([id]);
+      if (id && spaceId) {
+        navigateToBlock(id, spaceId);
+      }
+    }
+  }, []);
+
   const onPlaybacktimeClicked = useCallback(async () => {
     if (playerRef && playerRef.current) {
       const youtubeUrl = playerRef.current.getInternalPlayer().getVideoUrl();
@@ -284,9 +296,11 @@ const VideoPlayer = () => {
       };
 
       if (latestBlockLocation) {
-        CraftAPIHelper.addBLocks([block], latestBlockLocation);
+        const response = await CraftAPIHelper.addBLocks([block], latestBlockLocation);
+        onBlockAdded(response);
       } else {
-        CraftAPIHelper.addBLocks([block]);
+        const response = await CraftAPIHelper.addBLocks([block]);
+        onBlockAdded(response);
       }
     }
   }, []);
