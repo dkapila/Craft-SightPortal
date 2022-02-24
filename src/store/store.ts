@@ -15,9 +15,19 @@ import {
   PortalBlockType,
   ActiveViewType,
   FrequencyFilterType,
+  VideoPlayerType,
+  NotificationType,
 } from '../Types';
 
 const usePortalStore = create<PortalMainStore>((set) => ({
+  videoPlayer: {
+    isActive: true,
+    activeVideoUrl: 'https://youtu.be/EHheJCVYahw?t=147',
+  },
+  notificaiton: {
+    isShown: false,
+    text: '',
+  },
   platformType: 'Mac',
   results: [],
   resultsAcrossBlocks: false,
@@ -53,9 +63,27 @@ const usePortalStore = create<PortalMainStore>((set) => ({
       refreshResultsPending: resultsPending,
     }));
   },
+  setVideo: (player: VideoPlayerType) => {
+    set(() => ({
+      videoPlayer: player,
+    }));
+  },
+  setNotification: (item: NotificationType) => {
+    set(() => ({
+      notificaiton: item,
+    }));
+  },
   setAccentColor: (color: AccentColorType) => {
     set(() => ({
       accentColor: color,
+    }));
+  },
+  clearNotification: () => {
+    set(() => ({
+      notificaiton: {
+        isShown: false,
+        text: '',
+      },
     }));
   },
   setPlatform: (platform: DevicePlatform) => {

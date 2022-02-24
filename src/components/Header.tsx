@@ -1,4 +1,6 @@
 import React, { useState, useCallback } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 import styled from 'styled-components';
 
 import {
@@ -8,6 +10,7 @@ import {
 
 import usePortalStore from '../store/store';
 import AccentPicker from './AccentPicker/AccentPicker';
+import { getUrlsFromSelectedBlocks, getYoutubeLink } from '../utils/block';
 
 type PortalThemeButtonProps = {
   mouseOverInPortalHeader: boolean;
@@ -45,7 +48,8 @@ const StyledFrame = styled.iframe`
 `;
 
 const StyledHeaderContainer = styled.div`
-    display: flex;
+  display: flex;
+  align-items: center;
 `;
 
 const StyledExtensionHeader = styled.div`
@@ -73,12 +77,26 @@ const StyledIframeContainer = styled.div`
     width: 100px;
 `;
 
+const StyledFilterIconContainer = styled.div`
+  align-items: center;
+  display: flex;
+  width: 30px;
+  height: 28px;
+  justify-content: center;
+  border-radius: 5px;
+
+  &:hover {
+    background: ${(props) => props.theme.blockHoverBackground};
+  }
+`;
+
 const StyledHeaderText = styled.span<StyledHeaderTextProps>`
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
   transition: all 200ms ease-in;
   padding-right: 5px;
+  width: 80px;
   color: ${(props) => props.theme.primaryTextColor};
   letter-spacing: 0.3px;
 
@@ -91,6 +109,12 @@ const StyledHeaderText = styled.span<StyledHeaderTextProps>`
   }
 `;
 
+const StyledFilterIcon = styled(FontAwesomeIcon)`
+  color: ${(props) => props.theme.iconColor};
+  height: 14px;
+  transition: color 200ms ease-in;
+`;
+
 type HeaderProps = {
   onHeaderClicked: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
 };
@@ -101,6 +125,11 @@ const Header = ({ onHeaderClicked }: HeaderProps) => {
   const setAccentColor = usePortalStore((state: PortalMainStore) => state.setAccentColor);
   const [mouseOverInPortalHeader, setMouseOverInPortalHeader] = useState(false);
   const [mouseOverInPortalButton, setMouseOverInPortalButton] = useState(false);
+  const videoPlayer = usePortalStore((state: PortalMainStore) => state.videoPlayer);
+  const setVideo = usePortalStore((state: PortalMainStore) => state.setVideo);
+  const setNotification = usePortalStore((state: PortalMainStore) => state.setNotification);
+  const clearNotification = usePortalStore((state: PortalMainStore) => state.clearNotification);
+  const platformType = usePortalStore((state: PortalMainStore) => state.platformType);
 
   const onPortalHeaderMouseEnter = useCallback(() => {
     setMouseOverInPortalHeader(true);
@@ -115,6 +144,27 @@ const Header = ({ onHeaderClicked }: HeaderProps) => {
     setExtensionPreferencesViewShown(false);
     e.stopPropagation();
   }, [accentColor]);
+
+  const onVideoIconClicked = useCallback(async (e) => {
+    setExtensionPreferencesViewShown(false);
+    e.stopPropagation();
+
+    const urls = await getUrlsFromSelectedBlocks();
+    const youtubeLink = getYoutubeLink(urls);
+
+    if (youtubeLink) {
+      clearNotification();
+      setVideo({
+        isActive: true,
+        activeVideoUrl: (youtubeLink),
+      });
+    } else {
+      setNotification({
+        text: 'Select block with a YouTube link',
+        isShown: true,
+      });
+    }
+  }, [videoPlayer]);
 
   return (
     <StyledExtensionHeader
@@ -144,10 +194,19 @@ const Header = ({ onHeaderClicked }: HeaderProps) => {
               Sight Portal
             </StyledHeaderText>
             {
+              (platformType === 'Mac') && (
+                <StyledFilterIconContainer title="YouTube Preview" onClick={(e) => onVideoIconClicked(e)}>
+                  <StyledFilterIcon
+                    icon={faYoutube}
+                  />
+                </StyledFilterIconContainer>
+              )
+            }
+            {
               (navigator.onLine) && (
               <StyledIframeContainer>
                 <StyledOverlayDiv onClick={(e) => onHeaderClicked(e)} />
-                <StyledFrame frameBorder="0" title="Sight Portal Updates" src="https://sightportal.dharamkapila.repl.co/Versions/0.2/0.2betaHeader.html" />
+                <StyledFrame frameBorder="0" title="Sight Portal Updates" src="https://sightportal.dharamkapila.repl.co/Versions/0.3/0.3betaHeader.html" />
               </StyledIframeContainer>
               )
             }

@@ -61,6 +61,57 @@ export const navigateToBlock = (blockId: string, spaceId: string) => {
   CraftAPIHelper.openUrl(`craftdocs://open?blockId=${blockId}&spaceId=${spaceId}`);
 };
 
+export const getUrlsFromSelectedBlocks = async () => {
+  const result = await CraftAPIHelper.getSelectedBlocks();
+  if (result.status !== 'success') {
+    throw new Error(result.message);
+  }
+
+  const selectedBlocks = result.data;
+  const urls: string[] = [];
+  selectedBlocks.forEach((block) => {
+    if (block.type === 'urlBlock' && block.url) {
+      urls.push(block.url);
+    }
+
+    if (block.type === 'textBlock') {
+      (<CraftTextBlock>block).content.forEach((item) => {
+        if (item.link && item.link.type === 'url') {
+          urls.push(item.link.url);
+        }
+      });
+    }
+  });
+
+  return urls;
+};
+
+export const getYoutubeLink = (urls: string[]) => {
+  const link = urls.filter((url) => {
+    // https://stackoverflow.com/a/28735961
+    const p = /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+    if (url.match(p)) {
+      return true;
+    }
+
+    return false;
+  });
+
+  if (link.length > 0) {
+    const timeStamp = new URLSearchParams(link[0].split('?')[1]).get('t');
+    const videoId = new URLSearchParams(link[0].split('?')[1]).get('v');
+    let formattedLink = `${link[0].split('?')[0]}?v=${videoId}`;
+
+    if (timeStamp) {
+      formattedLink = `${formattedLink}&t=${timeStamp}`;
+    }
+
+    return formattedLink;
+  }
+
+  return null;
+};
+
 export const getRandomBlock: () => Promise<PortalBlockType | null> = async () => {
   const response = await new CraftAPIHelper().getCurrentPageBlocks();
   if (response.status === 'success' && response.data) {

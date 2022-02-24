@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import ReactDOM from 'react-dom';
+import { CSSTransition } from 'react-transition-group';
 import * as E from 'fp-ts/Either';
 import * as T from 'io-ts';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 import smoothscroll from 'smoothscroll-polyfill';
+import { BottomSheet } from 'react-spring-bottom-sheet';
 
 import {
   PortalMainStore,
@@ -22,6 +24,9 @@ import getBlocks from './search/blockSearch';
 import Header from './components/Header';
 import { LOCAL_STORAGE_KEY } from './config/config';
 import FrequencyResults from './components/FrequencyResults';
+import VideoPlayer from './components/Video/VideoPlayer';
+import Notification from './components/Notification/Notification';
+import withOpacity from './utils/colors';
 
 const GlobalStyles = createGlobalStyle`
   html, body, #react-root {
@@ -32,6 +37,14 @@ const GlobalStyles = createGlobalStyle`
   }
 
   body {
+    --rsbs-backdrop-bg: rgba(0, 0, 0, 0.6);
+    --rsbs-bg: ${(props) => props.theme.videoBackground};
+    --rsbs-handle-bg: ${(props) => withOpacity(props.theme.accentColor, 60)};
+    --rsbs-max-w: auto;
+    --rsbs-ml: env(safe-area-inset-left);
+    --rsbs-mr: env(safe-area-inset-right);
+    --rsbs-overlay-rounded: 16px;
+
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizelegibility;
     font-variant-numeric: lining-nums;
@@ -42,10 +55,42 @@ const GlobalStyles = createGlobalStyle`
     background: ${(props) => props.theme.primaryBackground}
   }
 
+  [data-rsbs-header]:hover {
+    --rsbs-handle-bg: ${(props) => withOpacity(props.theme.accentColor, 90)};
+  }
+
   html, body {
     padding: 0;
     margin: 0;
     font-family: system-ui, -apple-system;
+  }
+
+  .portal-card-settings-enter {
+    opacity: 0;
+    position: relative;
+    max-height: 0;
+    transform: scale(0.9);
+  }
+
+  .portal-card-settings-enter-active {
+    opacity: 1;
+    max-height: 400px;
+    transition-duration: 300ms;
+    transform: translateX(0);
+    transition: opacity 300ms, transform 300ms top 300ms;
+  }
+
+  .portal-card-settings-exit {
+    max-height: 400px;
+    opacity: 1;
+  }
+
+  .portal-card-settings-exit-active {
+    opacity: 0;
+    max-height: 0px;
+    transform: scale(0.9);
+    transition-duration: 0.5s;
+    transition: all 300ms;
   }
 `;
 
@@ -80,8 +125,11 @@ const App = () => {
   const searchInstances = usePortalStore((state: PortalMainStore) => state.searchInstances);
   const starredBlocks = usePortalStore((state: PortalMainStore) => state.starredBlocks);
   const setStarredBlocks = usePortalStore((state: PortalMainStore) => state.setStarredBlocks);
+  const setVideo = usePortalStore((state: PortalMainStore) => state.setVideo);
+  const videoPlayer = usePortalStore((state: PortalMainStore) => state.videoPlayer);
   const version = usePortalStore((state: PortalMainStore) => state.version);
   const setSearchInstances = usePortalStore((state: PortalMainStore) => state.setSearchInstances);
+  const notificaiton = usePortalStore((state: PortalMainStore) => state.notificaiton);
   const setResultsExistAcrossMultipleBlocks = usePortalStore(
     (state: PortalMainStore) => state.setResultsAcrossMultipleBlocks,
   );
@@ -97,13 +145,14 @@ const App = () => {
         searchInstances,
         version,
         starredBlocks,
+        videoPlayer,
       };
 
       const instances = JSON.stringify(sessionData);
 
       CraftAPIHelper.saveToSession(LOCAL_STORAGE_KEY, instances);
     }
-  }, [searchInstances, accentColor, starredBlocks]);
+  }, [searchInstances, accentColor, starredBlocks, videoPlayer]);
 
   const getDataFromStorage = useCallback(() => {
     const onExtensionLoaded = async () => {
@@ -115,6 +164,7 @@ const App = () => {
           setSearchInstances(data.searchInstances);
           setAccentColor(data.accentColor);
           setStarredBlocks(data.starredBlocks);
+          setVideo(data.videoPlayer);
           setSessionDataLoaded(true);
         }
       } else {
@@ -150,7 +200,7 @@ const App = () => {
   useEffect(() => {
     updateSearchResults();
     savePreferences();
-  }, [searchInstances, accentColor, starredBlocks]);
+  }, [searchInstances, accentColor, starredBlocks, videoPlayer]);
 
   const extensionContent = (
     <ThemeProvider theme={theme as Theme}>
@@ -163,6 +213,14 @@ const App = () => {
               setShowHelp((state) => !state);
             }}
             />
+            <CSSTransition
+              in={notificaiton.isShown}
+              timeout={300}
+              classNames="portal-card-settings"
+              unmountOnExit
+            >
+              <Notification />
+            </CSSTransition>
             { !showHelp
               && (
                 <StyledFilterContainer>
@@ -187,6 +245,13 @@ const App = () => {
                   <About />
                 </ExtensionBodyContainer>
               )}
+            <BottomSheet
+              blocking={false}
+              onDismiss={() => setVideo({ isActive: false, activeVideoUrl: undefined })}
+              open={videoPlayer.isActive}
+            >
+              <VideoPlayer />
+            </BottomSheet>
           </ExtensionContainer>
         )
       }

@@ -161,11 +161,24 @@ export const PortalBlock = t.type({
 
 export type PortalBlockType = t.TypeOf<typeof PortalBlock>;
 
+const VideoPlayerRequired = t.type({
+  isActive: t.boolean,
+});
+
+const VideoPlayerOptional = t.partial({
+  activeVideoUrl: t.string,
+});
+
+const VideoPlayer = t.intersection([VideoPlayerRequired, VideoPlayerOptional]);
+
+export type VideoPlayerType = t.TypeOf<typeof VideoPlayer>;
+
 export const SessionData = t.type({
   version: t.string,
   accentColor: AccentColor,
   searchInstances: t.array(SearchInstance),
   starredBlocks: t.array(PortalBlock),
+  videoPlayer: VideoPlayer,
 });
 
 export type SessionDataType = t.TypeOf<typeof SessionData>;
@@ -216,6 +229,11 @@ export type PortalResult = {
   acrossMultipleBlocks: boolean,
 };
 
+export type NotificationType = {
+  text: string,
+  isShown: boolean,
+}
+
 export type PortalStore = {
   version: string,
   platformType: DevicePlatform,
@@ -225,7 +243,9 @@ export type PortalStore = {
   results: PortalResultBlock [],
   resultsAcrossBlocks: boolean,
   starredBlocks: PortalBlockType [],
-  refreshResultsPending: boolean
+  refreshResultsPending: boolean,
+  videoPlayer: VideoPlayerType,
+  notificaiton: NotificationType,
 };
 
 export type FrequencyResult = {
@@ -252,7 +272,9 @@ export type PortalMainStore = PortalStore & {
   setLinkFilter: (instanceId: string, filterOptions: LinkFilterOptionsType) => void;
   setTextFilter: (instanceId: string, filterOptions: TextFilterOptionsType) => void;
   setFrequencyFilter: (instanceId: string, filterOptions: FrequencyFilterType) => void;
-
+  setVideo: (videoPlayer: VideoPlayerType) => void;
+  clearNotification: () => void;
+  setNotification: (item: NotificationType) => void;
   addStarredBlock: (starredBlock: PortalBlockType) => void;
   removeStarredBlock: (id: string) => void;
   setStarredBlocks: (blocks: PortalBlockType[]) => void;
@@ -278,4 +300,5 @@ export type Theme = {
   toggleSwitchDisabledBackground: string,
   invertedPrimaryBackground: string,
   invertedPrimaryTextColor: string,
+  videoBackground: string,
 };
