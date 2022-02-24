@@ -22,7 +22,6 @@ import {
 const usePortalStore = create<PortalMainStore>((set) => ({
   videoPlayer: {
     isActive: true,
-    activeVideoUrl: 'https://youtu.be/EHheJCVYahw?t=147',
   },
   notificaiton: {
     isShown: false,
