@@ -52,34 +52,6 @@ const StyledScrollToTopButtonContainer = styled(animated.div)`
 
 const StyledContainer = styled(animated.div)`
   overflow-x: hidden;
-
-  .portal-card-settings-enter {
-    opacity: 0;
-    position: relative;
-    max-height: 0;
-    transform: scale(0.9);
-  }
-
-  .portal-card-settings-enter-active {
-    opacity: 1;
-    max-height: 400px;
-    transition-duration: 500ms;
-    transform: translateX(0);
-    transition: opacity 500ms, transform 500ms top 500ms;
-  }
-
-  .portal-card-settings-exit {
-    max-height: 400px;
-    opacity: 1;
-  }
-
-  .portal-card-settings-exit-active {
-    opacity: 0;
-    max-height: 0px;
-    transform: scale(0.9);
-    transition-duration: 0.5s;
-    transition: all 500ms;
-  }
 `;
 
 const SearchResults = () => {
@@ -166,15 +138,6 @@ const SearchResults = () => {
               <StyledTextSpan>
                 No Results :(
               </StyledTextSpan>
-              {
-                (platformType === 'Mac') && (
-                  <StyledTextSpan>
-                    <b>Tip</b>
-                    : After navigating to a new tab/page, click on a block
-                    in that page to ensure Sight Portal is querying the currently active page.
-                  </StyledTextSpan>
-                )
-              }
             </StyledResultsContainer>
           )
         }

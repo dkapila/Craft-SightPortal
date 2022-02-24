@@ -8,35 +8,7 @@ import FilterTextBox from './TextBox/FilterTextBox';
 import usePortalStore from '../store/store';
 import { ActiveViewType, PortalMainStore } from '../Types';
 
-const StyledSearchFilter = styled.div`
-  .portal-card-settings-enter {
-    opacity: 0;
-    position: relative;
-    max-height: 0;
-    transform: scale(0.9);
-  }
-
-  .portal-card-settings-enter-active {
-    opacity: 1;
-    max-height: 400px;
-    transition-duration: 300ms;
-    transform: translateX(0);
-    transition: opacity 300ms, transform 300ms top 300ms;
-  }
-
-  .portal-card-settings-exit {
-    max-height: 400px;
-    opacity: 1;
-  }
-
-  .portal-card-settings-exit-active {
-    opacity: 0;
-    max-height: 0px;
-    transform: scale(0.9);
-    transition-duration: 0.5s;
-    transition: all 300ms;
-  }
-`;
+const StyledSearchFilter = styled.div``;
 
 const StyledFilterParentOptions = styled.div`
   display: flex;
