@@ -21,7 +21,7 @@ import {
 
 const usePortalStore = create<PortalMainStore>((set) => ({
   videoPlayer: {
-    isActive: true,
+    isActive: false,
   },
   notificaiton: {
     isShown: false,
