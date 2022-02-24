@@ -58,6 +58,10 @@ class CraftAPIHelper {
     throw new Error('No Current Page found');
   }
 
+  public static async selectedBlocks(blockIds: string[]) {
+    return craft.editorApi.selectBlocks(blockIds);
+  }
+
   public static async getSelectedBlocks() {
     return craft.editorApi.getSelection();
   }
