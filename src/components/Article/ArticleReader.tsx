@@ -319,7 +319,7 @@ const ArticleReader = () => {
             Constants.HIGHLIGHTED_BLOCK_IN_READER_DATA_ATTRIBUTE,
           );
           if (!blockId) {
-            const craftBlocks = CraftAPIHelper.craftMarkdownToBlock(markdownText);
+            const craftBlocks = CraftAPIHelper.markdownToCraftBlock(markdownText);
             promises.push(insertNewBlock(craftBlocks));
           } else {
             promises.push(CraftAPIHelper.deleteBlock([blockId]));
