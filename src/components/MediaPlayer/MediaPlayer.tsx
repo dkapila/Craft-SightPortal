@@ -6,7 +6,8 @@ import ReactPlayer from 'react-player';
 import 'react-spring-bottom-sheet/dist/style.css';
 
 import {
-  faPlayCircle, faPauseCircle, faExternalLinkSquareAlt, faStepBackward, faStepForward, faTimes,
+  faPlayCircle, faPauseCircle, faSquareUpRight,
+  faStepBackward, faStepForward, faAngleDown, faAngleUp,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,24 +15,28 @@ import { ApiResponse, CraftBlock, CraftTextBlockInsert } from '@craftdocs/craft-
 import CraftAPIHelper from '../../api/craftAPIHelper';
 import { PortalMainStore } from '../../Types';
 import usePortalStore from '../../store/store';
-import getFormattedTime from '../../utils/time';
+import { getFormattedTime } from '../../utils/time';
 import withOpacity from '../../utils/colors';
-import { navigateToBlock } from '../../utils/block';
+import { insertNewBlock, navigateToBlock } from '../../utils/block';
+
+interface ISeekContainerProps {
+  $videoPlayerMinimized: boolean,
+}
 
 const PlayerContainer = styled.div`
-  z-index: 10;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 `;
 
-const StyledVideoControlsContainer = styled.div`
+const StyledMediaControlsContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   margin-bottom: 5px;
+  -webkit-user-select: none;
 
   > div {
     flex-grow: 1.1;
@@ -50,6 +55,7 @@ const StyledFilterIconContainer = styled.div<FilterIconProps>`
   height: 28px;
   justify-content: center;
   border-radius: 5px;
+  -webkit-user-select: none;
 
   &:hover {
     background: ${(props) => props.theme.blockHoverBackground};
@@ -75,9 +81,9 @@ const StyledPlaceholderDiv = styled.div`
   height: 150px;
 `;
 
-const StyledSeekContainer = styled.div`
+const StyledSeekContainer = styled.div<ISeekContainerProps>`
   width: 100%;
-  padding: 5px;
+  padding: ${(props) => (props.$videoPlayerMinimized ? '0px' : '5px')};
   display: flex;
   align-items: center;
   gap: 5px;
@@ -147,8 +153,8 @@ const StyledTimestampLinkLabel = styled.div`
   color: ${(props) => props.theme.primaryTextColor};
 `;
 
-const VideoPlayer = () => {
-  const [loadVideo, setLoadVideo] = useState(false);
+const MediaPlayer = () => {
+  const [loadMedia, setLoadMedia] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [totalPlayedSeconds, setTotalPlayedSeconds] = useState(0);
@@ -156,9 +162,11 @@ const VideoPlayer = () => {
   const [seeking, setSeeking] = useState(false);
   const playerRef = useRef<ReactPlayer>(null);
   const platformType = usePortalStore((state) => state.platformType);
-  const videoPlayer = usePortalStore((state: PortalMainStore) => state.videoPlayer);
-  const setVideo = usePortalStore((state: PortalMainStore) => state.setVideo);
+  const mediaPlayer = usePortalStore((state: PortalMainStore) => state.mediaPlayer);
   const [mouseOverOnPlaybackTime, setMouseOverOnPlaybackTime] = useState(false);
+  const [playerReady, setPlayerReady] = useState(false);
+  const [activeUrl, setActiveUrl] = useState('');
+  const [videoPlayerMinimized, setVideoPlayerMinimized] = useState(false);
   const handleSeekMouseDown = () => {
     setSeeking(true);
   };
@@ -174,12 +182,11 @@ const VideoPlayer = () => {
     }
   };
 
-  const onClosePlayerClicked = useCallback(() => {
-    setVideo({
-      activeVideoUrl: undefined,
-      isActive: false,
-    });
-  }, [videoPlayer]);
+  const onMinimizeToggle = useCallback(() => {
+    if (playerReady) {
+      setVideoPlayerMinimized((state) => !state);
+    }
+  }, [mediaPlayer, playerReady]);
 
   const onplay = useCallback(() => {
     setPlaying(true);
@@ -190,7 +197,7 @@ const VideoPlayer = () => {
   }, [playing]);
 
   const onOpenLink = useCallback(() => {
-    let url = videoPlayer.activeVideoUrl;
+    let url = mediaPlayer.activeMediaUrl;
     if (playerRef && url) {
       const currentTime = playerRef.current?.getCurrentTime();
       if (url && currentTime) {
@@ -201,7 +208,7 @@ const VideoPlayer = () => {
     if (url) {
       CraftAPIHelper.openUrl(url);
     }
-  }, [videoPlayer]);
+  }, [mediaPlayer]);
 
   const onPlaybackSpeedClicked = useCallback(() => {
     if (playbackRate === 1) {
@@ -253,18 +260,29 @@ const VideoPlayer = () => {
   }, []);
 
   const onPlaybackimeMouseEnter = useCallback(() => {
-    setMouseOverOnPlaybackTime(true);
-  }, []);
+    if (!mediaPlayer.onlyAudio) {
+      setMouseOverOnPlaybackTime(true);
+    }
+  }, [mediaPlayer]);
 
   const onPlaybackimeMouseLeave = useCallback(() => {
-    setMouseOverOnPlaybackTime(false);
-  }, []);
+    if (!mediaPlayer.onlyAudio) {
+      setMouseOverOnPlaybackTime(false);
+    }
+  }, [mediaPlayer]);
 
   useEffect(() => {
     setTimeout(() => {
-      setLoadVideo(true);
+      setLoadMedia(true);
     }, 500);
   }, []);
+
+  useEffect(() => {
+    if ((mediaPlayer.activeMediaUrl) && (mediaPlayer.activeMediaUrl) !== activeUrl) {
+      setPlayerReady(false);
+      setActiveUrl(mediaPlayer.activeMediaUrl);
+    }
+  }, [mediaPlayer, activeUrl]);
 
   const onBlockAdded = useCallback(async (response: ApiResponse<CraftBlock[]>) => {
     if (response.status === 'success') {
@@ -278,11 +296,10 @@ const VideoPlayer = () => {
   }, []);
 
   const onPlaybacktimeClicked = useCallback(async () => {
-    if (playerRef && playerRef.current) {
+    if (playerRef && playerRef.current && !mediaPlayer.onlyAudio) {
       const youtubeUrl = playerRef.current.getInternalPlayer().getVideoUrl();
       const currentTime = Math.floor(playerRef.current.getCurrentTime());
       const formattedLink = `${youtubeUrl.split('?')[0]}?t=${currentTime}&v=${playerRef.current.getInternalPlayer().getVideoData().video_id}`;
-      const latestBlockLocation = await new CraftAPIHelper().getLatestSelectedBlockLocation();
 
       const block: CraftTextBlockInsert = {
         type: 'textBlock',
@@ -295,31 +312,26 @@ const VideoPlayer = () => {
         }],
       };
 
-      if (latestBlockLocation) {
-        const response = await CraftAPIHelper.addBLocks([block], latestBlockLocation);
-        onBlockAdded(response);
-      } else {
-        const response = await CraftAPIHelper.addBLocks([block]);
-        onBlockAdded(response);
-      }
+      const response = await insertNewBlock([block]);
+      onBlockAdded(response);
     }
   }, []);
 
   return (
     <PlayerContainer>
       {
-        (!loadVideo) && (
+        (!loadMedia && !mediaPlayer.onlyAudio) && (
           <StyledPlaceholderDiv />
         )
       }
       {
-        (loadVideo) && (
+        (loadMedia) && (
           <StyledReactPlayer
             ref={playerRef}
             className="react-player"
             width="95%"
-            height="150"
-            url={videoPlayer.activeVideoUrl}
+            height={videoPlayerMinimized ? 0 : 150}
+            url={mediaPlayer.activeMediaUrl}
             playing={playing}
             config={{
               youtube: {
@@ -327,6 +339,7 @@ const VideoPlayer = () => {
                 playerVars: { showinfo: 0, modestbranding: true, playsinline: 1 },
               },
             }}
+            onReady={() => setPlayerReady(true)}
             playbackRate={playbackRate}
             onPlay={() => onplay()}
             onPause={() => onPause()}
@@ -334,7 +347,7 @@ const VideoPlayer = () => {
           />
         )
       }
-      <StyledSeekContainer>
+      <StyledSeekContainer $videoPlayerMinimized={videoPlayerMinimized}>
         {
           (!mouseOverOnPlaybackTime) && (
             <>
@@ -356,21 +369,21 @@ const VideoPlayer = () => {
                 <StyledFilterIcon
                   size="xs"
                   $isWeb={platformType === 'Web'}
-                  icon={faExternalLinkSquareAlt}
+                  icon={faSquareUpRight}
                 />
               </StyledFilterIconContainer>
             </>
           )
         }
         {
-        (mouseOverOnPlaybackTime) && (
+        (mouseOverOnPlaybackTime && !mediaPlayer.onlyAudio) && (
           <StyledTimestampLinkLabel>
             Click to insert timestamp link
           </StyledTimestampLinkLabel>
         )
         }
       </StyledSeekContainer>
-      <StyledVideoControlsContainer>
+      <StyledMediaControlsContainer unselectable="on">
         <StyledPlaybackTimeIndicator
           $isWeb={platformType === 'Web'}
           onMouseEnter={() => onPlaybackimeMouseEnter()}
@@ -413,15 +426,20 @@ const VideoPlayer = () => {
             icon={faStepForward}
           />
         </StyledFilterIconContainer>
-        <StyledFilterIconContainer $isWeb={platformType === 'Web'} onClick={() => onClosePlayerClicked()}>
-          <StyledFilterIcon
-            $isWeb={platformType === 'Web'}
-            icon={faTimes}
-          />
-        </StyledFilterIconContainer>
-      </StyledVideoControlsContainer>
+        {
+          (!mediaPlayer.onlyAudio)
+          && (
+            <StyledFilterIconContainer $isWeb={platformType === 'Web'} onClick={() => onMinimizeToggle()}>
+              <StyledFilterIcon
+                $isWeb={platformType === 'Web'}
+                icon={videoPlayerMinimized ? faAngleUp : faAngleDown}
+              />
+            </StyledFilterIconContainer>
+          )
+        }
+      </StyledMediaControlsContainer>
     </PlayerContainer>
   );
 };
 
-export default VideoPlayer;
+export default MediaPlayer;

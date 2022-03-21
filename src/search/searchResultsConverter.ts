@@ -26,6 +26,7 @@ class SearchResultsConverter {
         parentId: block.parentId,
         level: block.level,
         blockId: block.craftBlockId,
+        fullString,
         resultText,
         listStyleType: block.listStyleType,
       });

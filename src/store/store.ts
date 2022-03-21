@@ -15,14 +15,24 @@ import {
   PortalBlockType,
   ActiveViewType,
   FrequencyFilterType,
-  VideoPlayerType,
+  MediaPlayerType,
   NotificationType,
+  ArticleType,
+  ParsedArticle,
 } from '../Types';
 
 const usePortalStore = create<PortalMainStore>((set) => ({
-  videoPlayer: {
+  mediaPlayer: {
     isActive: false,
+    activeMediaUrl: 'https://www.youtube.com/watch?v=GpB_ycxPOWY&list=PLm9lIVuqlxLk_2dwCTdLfEEmeG0mmgVWQ&index=6',
+    onlyAudio: false,
   },
+  article: {
+    isActive: true,
+    activeUrl: 'https://www.nytimes.com/2022/03/16/movies/dune-denis-villeneuve-sound.html',
+  },
+  articleLoading: false,
+  parsedArticle: null,
   notificaiton: {
     isShown: false,
     text: '',
@@ -62,9 +72,24 @@ const usePortalStore = create<PortalMainStore>((set) => ({
       refreshResultsPending: resultsPending,
     }));
   },
-  setVideo: (player: VideoPlayerType) => {
+  setParsedArticle: (item: ParsedArticle) => {
     set(() => ({
-      videoPlayer: player,
+      parsedArticle: item,
+    }));
+  },
+  setArticle: (item: ArticleType) => {
+    set(() => ({
+      article: item,
+    }));
+  },
+  setArticleLoading: (isLoading: boolean) => {
+    set(() => ({
+      articleLoading: isLoading,
+    }));
+  },
+  setMedia: (player: MediaPlayerType) => {
+    set(() => ({
+      mediaPlayer: player,
     }));
   },
   setNotification: (item: NotificationType) => {

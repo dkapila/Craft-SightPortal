@@ -1,4 +1,6 @@
-import { CraftBlock, CraftTextBlock, CraftTextRun } from '@craftdocs/craft-extension-api';
+import {
+  ApiResponse, CraftBlock, CraftBlockInsert, CraftTextBlock, CraftTextRun,
+} from '@craftdocs/craft-extension-api';
 import { v4 as uuidv4 } from 'uuid';
 import { PortalBlockType, StyledListType } from 'src/Types';
 import CraftAPIHelper from '../api/craftAPIHelper';
@@ -110,6 +112,18 @@ export const getYoutubeLink = (urls: string[]) => {
   }
 
   return null;
+};
+
+export const insertNewBlock = async (
+  craftBlocksToInsert: CraftBlockInsert [],
+): Promise<ApiResponse<CraftBlock[]>> => {
+  const latestBlockLocation = await new CraftAPIHelper().getLatestSelectedBlockLocation();
+
+  if (latestBlockLocation) {
+    return CraftAPIHelper.addBLocks(craftBlocksToInsert, latestBlockLocation);
+  }
+
+  return CraftAPIHelper.addBLocks(craftBlocksToInsert);
 };
 
 export const getRandomBlock: () => Promise<PortalBlockType | null> = async () => {
