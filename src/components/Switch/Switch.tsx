@@ -21,6 +21,7 @@ const StyledLabel = styled.label<IProps>`
 `;
 
 const StyledSwitchContainer = styled.div`
+  user-select: none;
   position: relative;
   display: flex;
   padding-top: 5px;
@@ -91,13 +92,11 @@ const Switch = ({ enabled, onToggled, label }: SwitchProps) => {
         <StyledCheckboxInput
           checked={enabled}
           onChange={(e) => onToggled(e.target.checked)}
-          className="react-switch-checkbox"
           id={id}
           type="checkbox"
         />
         <StyledLabel
           isEnabled={enabled}
-          className="react-switch-label"
           htmlFor={id}
         >
           <StyledSwitchSpan isEnabled={enabled} className={enabled ? 'react-switch-on' : 'react-switch-off'} />

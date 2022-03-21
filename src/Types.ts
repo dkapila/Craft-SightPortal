@@ -56,6 +56,12 @@ const ActiveSearchView = t.keyof({
 
 export type ActiveSearchViewType = t.TypeOf<typeof ActiveSearchView>;
 
+const ArticleFontSize = t.keyof({
+  Small: null, Medium: null, Large: null,
+});
+
+export type ArticleFontSizeType = t.TypeOf<typeof ArticleFontSize>;
+
 const ActiveView = t.keyof({
   SearchView: null, FrequencyView: null,
 });
@@ -161,24 +167,39 @@ export const PortalBlock = t.type({
 
 export type PortalBlockType = t.TypeOf<typeof PortalBlock>;
 
-const VideoPlayerRequired = t.type({
+const MediaPlayerRequired = t.type({
+  onlyAudio: t.boolean,
   isActive: t.boolean,
 });
 
-const VideoPlayerOptional = t.partial({
-  activeVideoUrl: t.string,
+const MediaPlayerOptional = t.partial({
+  activeMediaUrl: t.string,
 });
 
-const VideoPlayer = t.intersection([VideoPlayerRequired, VideoPlayerOptional]);
+const MediaPlayer = t.intersection([MediaPlayerRequired, MediaPlayerOptional]);
 
-export type VideoPlayerType = t.TypeOf<typeof VideoPlayer>;
+export type MediaPlayerType = t.TypeOf<typeof MediaPlayer>;
+
+const ArticleRequired = t.type({
+  isActive: t.boolean,
+});
+
+const ArticleOptional = t.partial({
+  activeUrl: t.string,
+  articleComfortMode: t.boolean,
+});
+
+const Article = t.intersection([ArticleRequired, ArticleOptional]);
+
+export type ArticleType = t.TypeOf<typeof Article>;
 
 export const SessionData = t.type({
   version: t.string,
   accentColor: AccentColor,
   searchInstances: t.array(SearchInstance),
   starredBlocks: t.array(PortalBlock),
-  videoPlayer: VideoPlayer,
+  mediaPlayer: MediaPlayer,
+  article: Article,
 });
 
 export type SessionDataType = t.TypeOf<typeof SessionData>;
@@ -218,6 +239,7 @@ export type PortalLinkResult = PortalResultBase & {
 export type PortalTextResult = PortalResultBase & {
   type: 'PortalTextResult',
   resultText: string,
+  fullString: string,
   textStyleType: StyledTextType,
   listStyleType: StyledListType
 };
@@ -232,7 +254,25 @@ export type PortalResult = {
 export type NotificationType = {
   text: string,
   isShown: boolean,
-}
+};
+
+export type FrequencyResult = {
+  word: string,
+  length: number,
+  frequency: number,
+  id: string,
+};
+
+export type ParsedArticle = null | {
+  title: string;
+  byline: string;
+  dir: string;
+  content: string;
+  textContent: string;
+  length: number;
+  excerpt: string;
+  siteName: string;
+};
 
 export type PortalStore = {
   version: string,
@@ -244,15 +284,11 @@ export type PortalStore = {
   resultsAcrossBlocks: boolean,
   starredBlocks: PortalBlockType [],
   refreshResultsPending: boolean,
-  videoPlayer: VideoPlayerType,
+  mediaPlayer: MediaPlayerType,
+  article: ArticleType,
+  articleLoading: boolean,
+  parsedArticle: ParsedArticle,
   notificaiton: NotificationType,
-};
-
-export type FrequencyResult = {
-  word: string,
-  length: number,
-  frequency: number,
-  id: string,
 };
 
 export type PortalMainStore = PortalStore & {
@@ -272,13 +308,16 @@ export type PortalMainStore = PortalStore & {
   setLinkFilter: (instanceId: string, filterOptions: LinkFilterOptionsType) => void;
   setTextFilter: (instanceId: string, filterOptions: TextFilterOptionsType) => void;
   setFrequencyFilter: (instanceId: string, filterOptions: FrequencyFilterType) => void;
-  setVideo: (videoPlayer: VideoPlayerType) => void;
+  setMedia: (mediaPlayer: MediaPlayerType) => void;
+  setArticle: (article: ArticleType) => void;
+  setParsedArticle: (article: ParsedArticle) => void;
   clearNotification: () => void;
   setNotification: (item: NotificationType) => void;
   addStarredBlock: (starredBlock: PortalBlockType) => void;
   removeStarredBlock: (id: string) => void;
   setStarredBlocks: (blocks: PortalBlockType[]) => void;
   setStarredBlock: (block: PortalBlockType) => void;
+  setArticleLoading: (isLoading: boolean) => void;
 };
 
 export type Theme = {
@@ -300,5 +339,5 @@ export type Theme = {
   toggleSwitchDisabledBackground: string,
   invertedPrimaryBackground: string,
   invertedPrimaryTextColor: string,
-  videoBackground: string,
+  mediaPlayerBackground: string,
 };

@@ -30,6 +30,14 @@ class CraftAPIHelper {
     return craft.storageApi.put(storageKey, data);
   }
 
+  public static async deleteBlock(blockIds: string[]) {
+    return craft.dataApi.deleteBlocks(blockIds);
+  }
+
+  public static markdownToCraftBlock(markdownText: string) {
+    return craft.markdown.markdownToCraftBlocks(markdownText);
+  }
+
   public static craftBlockToMarkdown(blocks: CraftBlock[]) {
     return craft.markdown.craftBlockToMarkdown(blocks, 'common', { tableSupported: false });
   }

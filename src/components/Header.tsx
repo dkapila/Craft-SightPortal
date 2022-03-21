@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faYoutube } from '@fortawesome/free-brands-svg-icons';
+import { faBookReader } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
 
 import {
@@ -11,6 +12,7 @@ import {
 import usePortalStore from '../store/store';
 import AccentPicker from './AccentPicker/AccentPicker';
 import { getUrlsFromSelectedBlocks, getYoutubeLink } from '../utils/block';
+import Constants from '../utils/constants';
 
 type PortalThemeButtonProps = {
   mouseOverInPortalHeader: boolean;
@@ -18,6 +20,10 @@ type PortalThemeButtonProps = {
 
 type StyledHeaderTextProps = {
   mouseOverInPortalButton: boolean;
+};
+
+type FilterIconProps = {
+  $isActive: boolean,
 };
 
 const PortalThemeButton = styled.div<PortalThemeButtonProps>`
@@ -43,12 +49,12 @@ const PortalThemeButton = styled.div<PortalThemeButtonProps>`
 
 const StyledFrame = styled.iframe`
   height: 16px;
-  cursor: pointer;
   z-index: 1;
 `;
 
 const StyledHeaderContainer = styled.div`
   display: flex;
+  gap: 5px;
   align-items: center;
 `;
 
@@ -57,10 +63,7 @@ const StyledExtensionHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: start;
-  display: flex;
   gap: 10px;
-  cursor: pointer;
-  border-bottom: 1px solid ${(props) => props.theme.seperatorColor};
 `;
 
 const StyledOverlayDiv = styled.div`
@@ -69,7 +72,6 @@ const StyledOverlayDiv = styled.div`
   z-index: 10;
   height: 25px;
   width: 100%;
-  cursor: pointer;
   overflow-x: auto;
 `;
 
@@ -77,17 +79,26 @@ const StyledIframeContainer = styled.div`
     width: 100px;
 `;
 
-const StyledFilterIconContainer = styled.div`
+const StyledFilterIconContainer = styled.div<FilterIconProps>`
   align-items: center;
   display: flex;
   width: 30px;
   height: 28px;
   justify-content: center;
-  border-radius: 5px;
+  border-bottom: 2px solid transparent;
 
   &:hover {
     background: ${(props) => props.theme.blockHoverBackground};
   }
+
+  ${({ $isActive, theme }) => $isActive && `
+    border-bottom: 2px solid ${theme.accentColor};
+    border-radius: 0px;
+
+    &:hover {
+      background: ${theme.blockHoverBackground};
+    }
+  `}
 `;
 
 const StyledHeaderText = styled.span<StyledHeaderTextProps>`
@@ -95,7 +106,6 @@ const StyledHeaderText = styled.span<StyledHeaderTextProps>`
   font-size: 13px;
   font-weight: 500;
   transition: all 200ms ease-in;
-  padding-right: 5px;
   width: 80px;
   color: ${(props) => props.theme.primaryTextColor};
   letter-spacing: 0.3px;
@@ -109,7 +119,7 @@ const StyledHeaderText = styled.span<StyledHeaderTextProps>`
   }
 `;
 
-const StyledFilterIcon = styled(FontAwesomeIcon)`
+const StyledFilterIcon = styled(FontAwesomeIcon)<FilterIconProps>`
   color: ${(props) => props.theme.iconColor};
   height: 14px;
   transition: color 200ms ease-in;
@@ -120,13 +130,15 @@ type HeaderProps = {
 };
 
 const Header = ({ onHeaderClicked }: HeaderProps) => {
-  const [extensionPreferencesViewShown, setExtensionPreferencesViewShown] = useState(false);
+  const [accentPickerShown, setAccentPickerShown] = useState(false);
   const accentColor = usePortalStore((state: PortalMainStore) => state.accentColor);
   const setAccentColor = usePortalStore((state: PortalMainStore) => state.setAccentColor);
   const [mouseOverInPortalHeader, setMouseOverInPortalHeader] = useState(false);
   const [mouseOverInPortalButton, setMouseOverInPortalButton] = useState(false);
-  const videoPlayer = usePortalStore((state: PortalMainStore) => state.videoPlayer);
-  const setVideo = usePortalStore((state: PortalMainStore) => state.setVideo);
+  const mediaPlayer = usePortalStore((state: PortalMainStore) => state.mediaPlayer);
+  const article = usePortalStore((state: PortalMainStore) => state.article);
+  const setArticle = usePortalStore((state: PortalMainStore) => state.setArticle);
+  const setMedia = usePortalStore((state: PortalMainStore) => state.setMedia);
   const setNotification = usePortalStore((state: PortalMainStore) => state.setNotification);
   const clearNotification = usePortalStore((state: PortalMainStore) => state.clearNotification);
   const platformType = usePortalStore((state: PortalMainStore) => state.platformType);
@@ -141,12 +153,69 @@ const Header = ({ onHeaderClicked }: HeaderProps) => {
 
   const onAccentColorClicked = useCallback((e, key: AccentColorType) => {
     setAccentColor(key);
-    setExtensionPreferencesViewShown(false);
+    setAccentPickerShown(false);
     e.stopPropagation();
   }, [accentColor]);
 
-  const onVideoIconClicked = useCallback(async (e) => {
-    setExtensionPreferencesViewShown(false);
+  const hideArticle = useCallback(() => {
+    setArticle({
+      ...article,
+      activeUrl: undefined,
+      isActive: false,
+    });
+  }, [article]);
+
+  const hideMedia = useCallback(() => {
+    setMedia({
+      ...mediaPlayer,
+      activeMediaUrl: undefined,
+      isActive: false,
+    });
+  }, [mediaPlayer]);
+
+  const onReaderButtonClicked = useCallback(async (e) => {
+    setAccentPickerShown(false);
+    e.stopPropagation();
+
+    const urls = await getUrlsFromSelectedBlocks();
+    if (urls.length > 0) {
+      clearNotification();
+      if (urls[0].endsWith('.mp3')) {
+        if (mediaPlayer.activeMediaUrl === urls[0]) {
+          hideMedia();
+          return;
+        }
+
+        setMedia({
+          isActive: true,
+          onlyAudio: true,
+          activeMediaUrl: (urls[0]),
+        });
+      } else if (article.activeUrl === urls[0]) {
+        hideArticle();
+
+        return;
+      }
+
+      setArticle({
+        isActive: true,
+        activeUrl: (urls[0]),
+      });
+    } else {
+      if (article.isActive) {
+        hideArticle();
+
+        return;
+      }
+      setNotification({
+        text: 'Select block with an Article link',
+        isShown: true,
+      });
+    }
+  }, [article]);
+
+  const onYoutubeButtonClicked = useCallback(async (e) => {
+    setAccentPickerShown(false);
     e.stopPropagation();
 
     const urls = await getUrlsFromSelectedBlocks();
@@ -154,17 +223,31 @@ const Header = ({ onHeaderClicked }: HeaderProps) => {
 
     if (youtubeLink) {
       clearNotification();
-      setVideo({
+      if (mediaPlayer.activeMediaUrl === youtubeLink) {
+        hideMedia();
+        return;
+      }
+
+      setMedia({
         isActive: true,
-        activeVideoUrl: (youtubeLink),
+        onlyAudio: false,
+        activeMediaUrl: (youtubeLink),
       });
     } else {
+      if (mediaPlayer.isActive) {
+        setMedia({
+          ...mediaPlayer,
+          isActive: false,
+        });
+
+        return;
+      }
       setNotification({
         text: 'Select block with a YouTube link',
         isShown: true,
       });
     }
-  }, [videoPlayer]);
+  }, [mediaPlayer]);
 
   return (
     <StyledExtensionHeader
@@ -178,14 +261,14 @@ const Header = ({ onHeaderClicked }: HeaderProps) => {
         mouseOverInPortalHeader={mouseOverInPortalHeader}
         onClick={(e) => {
           e.stopPropagation();
-          setExtensionPreferencesViewShown((prevState) => !prevState);
+          setAccentPickerShown((prevState) => !prevState);
         }}
       />
       {
-        extensionPreferencesViewShown
+        accentPickerShown
         && <AccentPicker onAccentColorClicked={(e, key) => onAccentColorClicked(e, key)} />
       }
-      { !extensionPreferencesViewShown
+      { !accentPickerShown
           && (
           <StyledHeaderContainer>
             <StyledHeaderText
@@ -195,9 +278,20 @@ const Header = ({ onHeaderClicked }: HeaderProps) => {
             </StyledHeaderText>
             {
               (platformType === 'Mac') && (
-                <StyledFilterIconContainer title="YouTube Preview" onClick={(e) => onVideoIconClicked(e)}>
+                <StyledFilterIconContainer $isActive={mediaPlayer.isActive} title="YouTube Preview" onClick={(e) => onYoutubeButtonClicked(e)}>
                   <StyledFilterIcon
+                    $isActive={mediaPlayer.isActive}
                     icon={faYoutube}
+                  />
+                </StyledFilterIconContainer>
+              )
+            }
+            {
+              (platformType === 'Mac') && (
+                <StyledFilterIconContainer $isActive={article.isActive} title="Read Article" onClick={(e) => onReaderButtonClicked(e)}>
+                  <StyledFilterIcon
+                    $isActive={article.isActive}
+                    icon={faBookReader}
                   />
                 </StyledFilterIconContainer>
               )
@@ -206,7 +300,7 @@ const Header = ({ onHeaderClicked }: HeaderProps) => {
               (navigator.onLine) && (
               <StyledIframeContainer>
                 <StyledOverlayDiv onClick={(e) => onHeaderClicked(e)} />
-                <StyledFrame frameBorder="0" title="Sight Portal Updates" src="https://sightportal.dharamkapila.repl.co/Versions/0.3/0.3betaHeader.html" />
+                <StyledFrame frameBorder="0" title="Sight Portal Updates" src={Constants.SIGHT_PORTAL_UPDATE_HEADER_STATUS_LINK} />
               </StyledIframeContainer>
               )
             }
