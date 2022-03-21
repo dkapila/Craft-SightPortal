@@ -24,12 +24,10 @@ import {
 const usePortalStore = create<PortalMainStore>((set) => ({
   mediaPlayer: {
     isActive: false,
-    activeMediaUrl: 'https://www.youtube.com/watch?v=GpB_ycxPOWY&list=PLm9lIVuqlxLk_2dwCTdLfEEmeG0mmgVWQ&index=6',
     onlyAudio: false,
   },
   article: {
-    isActive: true,
-    activeUrl: 'https://www.nytimes.com/2022/03/16/movies/dune-denis-villeneuve-sound.html',
+    isActive: false,
   },
   articleLoading: false,
   parsedArticle: null,

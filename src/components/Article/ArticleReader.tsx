@@ -44,6 +44,7 @@ const StyledReaderContentContainer = styled.div<ArticleContentProps>`
 
   dd {
     margin-inline-start: 0px;
+    margin-inline-end: 0px;
   }
 
   blockquote {
@@ -55,12 +56,12 @@ const StyledReaderContentContainer = styled.div<ArticleContentProps>`
   }
 
   ul, ol {
-    padding: 2px;
     padding-inline-start: 25px;
   }
 
   figure {
     margin-inline-start: 0;
+    margin-inline-end: 0;
   }
 
   video {
@@ -77,9 +78,10 @@ const StyledReaderContentContainer = styled.div<ArticleContentProps>`
   img {
     cursor: pointer;
     display: block;
-    max-width: 220px;
+    max-width: 100%;
     max-height: 220px;
     object-fit: cover;
+    margin: 0 auto;
   }
 
   th, td, div {
@@ -252,6 +254,9 @@ const ArticleReader = () => {
         target.removeAttribute(Constants.HIGHLIGHTED_BLOCK_IN_READER_DATA_ATTRIBUTE);
       }
 
+      if (response.data[0].type === 'imageBlock') {
+        CraftAPIHelper.navigateToBlockId(response.data[0].id);
+      }
       if (response.data[0].type === 'textBlock') {
         const { id } = response.data[0];
         const { spaceId } = response.data[0];
@@ -297,7 +302,7 @@ const ArticleReader = () => {
         if (tagName === 'IMG') {
           const block: CraftImageBlockInsert = {
             type: 'imageBlock',
-            filename: (target as HTMLImageElement).src,
+            url: (target as HTMLImageElement).src,
           };
 
           selectedTarget = target;
