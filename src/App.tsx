@@ -1,4 +1,9 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useLayoutEffect,
+} from 'react';
 import ReactDOM from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
 import * as E from 'fp-ts/Either';
@@ -20,13 +25,16 @@ import { useTheme } from './theme/theme';
 import CraftAPIHelper from './api/craftAPIHelper';
 import SearchResults from './components/SearchResults';
 import About from './components/About';
-import getBlocks from './search/blockSearch';
+import getBlocksInCurrentPage from './search/blockSearch';
 import Header from './components/Header';
 import { LOCAL_STORAGE_KEY } from './config/config';
 import FrequencyResults from './components/FrequencyResults';
-import VideoPlayer from './components/Video/VideoPlayer';
+import MediaPlayer from './components/MediaPlayer/MediaPlayer';
+import ArticleReader from './components/Article/ArticleReader';
 import Notification from './components/Notification/Notification';
 import withOpacity from './utils/colors';
+import ArticleHeader from './components/Article/ArticleHeader';
+import Constants from './utils/constants';
 
 const GlobalStyles = createGlobalStyle`
   html, body, #react-root {
@@ -34,11 +42,12 @@ const GlobalStyles = createGlobalStyle`
     scroll-behavior: smooth;
     position: relative;
     overflow-x: hidden;
+    user-select: none;
   }
 
   body {
     --rsbs-backdrop-bg: rgba(0, 0, 0, 0.6);
-    --rsbs-bg: ${(props) => props.theme.videoBackground};
+    --rsbs-bg: ${(props) => props.theme.mediaPlayerBackground};
     --rsbs-handle-bg: ${(props) => withOpacity(props.theme.accentColor, 60)};
     --rsbs-max-w: auto;
     --rsbs-ml: env(safe-area-inset-left);
@@ -53,6 +62,10 @@ const GlobalStyles = createGlobalStyle`
     font-feature-settings: "lnum" 1;
     transition: background 300ms ease-in;
     background: ${(props) => props.theme.primaryBackground}
+  }
+
+  [data-rsbs-header] {
+    padding-bottom: 0px;
   }
 
   [data-rsbs-header]:hover {
@@ -92,6 +105,20 @@ const GlobalStyles = createGlobalStyle`
     transition-duration: 0.5s;
     transition: all 300ms;
   }
+
+  .article-sheet {
+    background: ${(props) => props.theme.primaryBackground};
+  }
+
+  /* To ensure that the article sheet is below the media sheet */
+  [data-rsbs-has-header="true"] > div {
+    z-index: 2!important;
+  }
+
+  [data-rsbs-has-header='false'] [data-rsbs-header] {
+    padding-bottom: 10px;
+  }
+}
 `;
 
 const ExtensionContainer = styled.div`
@@ -125,8 +152,10 @@ const App = () => {
   const searchInstances = usePortalStore((state: PortalMainStore) => state.searchInstances);
   const starredBlocks = usePortalStore((state: PortalMainStore) => state.starredBlocks);
   const setStarredBlocks = usePortalStore((state: PortalMainStore) => state.setStarredBlocks);
-  const setVideo = usePortalStore((state: PortalMainStore) => state.setVideo);
-  const videoPlayer = usePortalStore((state: PortalMainStore) => state.videoPlayer);
+  const setMedia = usePortalStore((state: PortalMainStore) => state.setMedia);
+  const setArticle = usePortalStore((state: PortalMainStore) => state.setArticle);
+  const mediaPlayer = usePortalStore((state: PortalMainStore) => state.mediaPlayer);
+  const article = usePortalStore((state: PortalMainStore) => state.article);
   const version = usePortalStore((state: PortalMainStore) => state.version);
   const setSearchInstances = usePortalStore((state: PortalMainStore) => state.setSearchInstances);
   const notificaiton = usePortalStore((state: PortalMainStore) => state.notificaiton);
@@ -137,6 +166,14 @@ const App = () => {
   const { theme, themeLoaded } = useTheme();
   const setResults = usePortalStore((state: PortalMainStore) => state.setResults);
   const [showHelp, setShowHelp] = useState(false);
+  const [height, setHeight] = useState(0);
+
+  const snapPointsArray = useCallback(({ maxHeight }) => [
+    maxHeight - 300,
+    maxHeight - 45], [height]);
+
+  const defaultSnapPoint = useCallback(({ lastSnap, snapPoints }) => lastSnap
+    ?? Math.max(...snapPoints), [height]);
 
   const savePreferences = useCallback(() => {
     if (sessionDataLoaded) {
@@ -145,14 +182,15 @@ const App = () => {
         searchInstances,
         version,
         starredBlocks,
-        videoPlayer,
+        mediaPlayer,
+        article,
       };
 
       const instances = JSON.stringify(sessionData);
 
       CraftAPIHelper.saveToSession(LOCAL_STORAGE_KEY, instances);
     }
-  }, [searchInstances, accentColor, starredBlocks, videoPlayer]);
+  }, [searchInstances, accentColor, starredBlocks, mediaPlayer, article]);
 
   const getDataFromStorage = useCallback(() => {
     const onExtensionLoaded = async () => {
@@ -164,7 +202,12 @@ const App = () => {
           setSearchInstances(data.searchInstances);
           setAccentColor(data.accentColor);
           setStarredBlocks(data.starredBlocks);
-          setVideo(data.videoPlayer);
+          setTimeout(() => {
+            setMedia(data.mediaPlayer);
+          }, 500);
+          setTimeout(() => {
+            setArticle(data.article);
+          }, 500);
           setSessionDataLoaded(true);
         }
       } else {
@@ -184,7 +227,10 @@ const App = () => {
 
   const updateSearchResults = useCallback(() => {
     const getNewResults = async () => {
-      const response = await getBlocks(new CraftAPIHelper(), getCurrentInstance().filters);
+      const response = await getBlocksInCurrentPage(
+        new CraftAPIHelper(),
+        getCurrentInstance().filters,
+      );
       setResults(response.blocks);
       setResultsExistAcrossMultipleBlocks(response.acrossMultipleBlocks);
     };
@@ -192,15 +238,48 @@ const App = () => {
     getNewResults();
   }, [searchInstances, accentColor]);
 
+  useLayoutEffect(() => {
+    let timer: number | undefined;
+    const debounce = (func: () => void) => (event: Event) => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+
+      timer = setTimeout(func, 400, event);
+    };
+
+    const onWindowResized = () => {
+      setHeight(window.innerHeight);
+    };
+
+    window.addEventListener('resize', debounce(onWindowResized));
+    return () => window.removeEventListener('resize', onWindowResized);
+  }, []);
+
+  const surpressedErrorMessages = (event: ErrorEvent) => {
+    const messages = ['ResizeObserver loop completed with undelivered notifications.', 'Script error.'];
+
+    if (messages.includes(event.message)) {
+      event.preventDefault();
+    }
+  };
+
   useEffect(() => {
     smoothscroll.polyfill();
     getDataFromStorage();
+    window.addEventListener('error', surpressedErrorMessages);
+
+    if (!(window as any).craftDev) {
+      window.onerror = () => {
+      };
+    }
+    return () => window.removeEventListener('error', surpressedErrorMessages);
   }, []);
 
   useEffect(() => {
     updateSearchResults();
     savePreferences();
-  }, [searchInstances, accentColor, starredBlocks, videoPlayer]);
+  }, [searchInstances, accentColor, starredBlocks, mediaPlayer, article]);
 
   const extensionContent = (
     <ThemeProvider theme={theme as Theme}>
@@ -246,11 +325,26 @@ const App = () => {
                 </ExtensionBodyContainer>
               )}
             <BottomSheet
+              className={Constants.ARTICLE_SHEEET_CLAS_NAME}
+              maxHeight={height}
+              defaultSnap={defaultSnapPoint}
+              header={(
+                <ArticleHeader />
+              )}
               blocking={false}
-              onDismiss={() => setVideo({ isActive: false, activeVideoUrl: undefined })}
-              open={videoPlayer.isActive}
+              onDismiss={() => setArticle({ isActive: false, activeUrl: undefined })}
+              open={article.isActive}
+              snapPoints={snapPointsArray}
             >
-              <VideoPlayer />
+              <ArticleReader />
+            </BottomSheet>
+            <BottomSheet
+              className={Constants.MEDIA_SHEEET_CLAS_NAME}
+              blocking={false}
+              onDismiss={() => setMedia({ isActive: false, onlyAudio: false })}
+              open={mediaPlayer.isActive}
+            >
+              <MediaPlayer />
             </BottomSheet>
           </ExtensionContainer>
         )

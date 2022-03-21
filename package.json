@@ -1,6 +1,6 @@
 {
   "name": "craft-sight-portal",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A Craft Extension to search and explore your documents",
   "main": "index.ts",
   "scripts": {
@@ -12,12 +12,14 @@
   "devDependencies": {
     "@craftdocs/craft-extension-api": "0.0.4",
     "@craftdocs/craft-extension-api-sdk": "0.0.4",
+    "@types/dompurify": "^2.3.3",
     "@types/lodash.debounce": "^4.0.6",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
     "@types/react-transition-group": "^4.4.4",
     "@types/smoothscroll-polyfill": "^0.3.1",
     "@types/styled-components": "^5.1.21",
+    "@types/turndown": "^5.0.1",
     "@types/uuid": "^7.0.0",
     "@typescript-eslint/eslint-plugin": "^5.9.0",
     "@typescript-eslint/parser": "^5.9.0",
@@ -46,8 +48,11 @@
     "@fortawesome/free-brands-svg-icons": "^6.0.0",
     "@fortawesome/free-solid-svg-icons": "^6.0.0",
     "@fortawesome/react-fontawesome": "^0.1.17",
+    "@mozilla/readability": "^0.4.2",
     "@react-spring/web": "^9.4.2",
+    "dompurify": "^2.3.6",
     "fp-ts": "^2.11.8",
+    "html-react-parser": "^1.4.8",
     "io-ts": "^2.2.16",
     "lodash.debounce": "^4.0.8",
     "nanoid": "^3.1.30",
@@ -59,6 +64,7 @@
     "react-transition-group": "^4.4.2",
     "smoothscroll-polyfill": "^0.4.4",
     "styled-components": "^5.3.3",
+    "turndown": "^7.1.1",
     "uuid": "^7.0.3",
     "zustand": "^3.6.8"
   }

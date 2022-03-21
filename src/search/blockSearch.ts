@@ -3,6 +3,7 @@ import {
   SearchFiltersType,
   PortalBlockType,
   PortalResult,
+  PortalTextResult,
 } from '../Types';
 import CraftAPIHelper from '../api/craftAPIHelper';
 import FilterBuilder from './filterBuilder';
@@ -47,11 +48,12 @@ export const applyFilters = (
   };
 };
 
-const getBlocks = async (
+const getBlocksInCurrentPage = async (
   craftAPIHelper: CraftAPIHelper,
-  searchFilters: SearchFiltersType,
+  searchFilters?: SearchFiltersType,
 ): Promise<PortalResult> => {
   const results = await craftAPIHelper.getCurrentPageBlocks();
+  let blocksInPage: PortalTextResult[] = [];
   let resultBlocks: PortalResult = {
     blocks: [],
     acrossMultipleBlocks: false,
@@ -60,10 +62,17 @@ const getBlocks = async (
   if (results.status === 'success') {
     const { data } = results;
     const blocks = parseBlocks(data, '', 0, []);
-    resultBlocks = applyFilters(blocks, searchFilters);
+
+    if (searchFilters) {
+      resultBlocks = applyFilters(blocks, searchFilters);
+      return resultBlocks;
+    }
+
+    blocksInPage = new SearchResultsConverter(blocks).execute();
   }
 
+  resultBlocks.blocks = blocksInPage;
   return resultBlocks;
 };
 
-export default getBlocks;
+export default getBlocksInCurrentPage;

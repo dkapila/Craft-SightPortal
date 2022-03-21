@@ -15,14 +15,22 @@ import {
   PortalBlockType,
   ActiveViewType,
   FrequencyFilterType,
-  VideoPlayerType,
+  MediaPlayerType,
   NotificationType,
+  ArticleType,
+  ParsedArticle,
 } from '../Types';
 
 const usePortalStore = create<PortalMainStore>((set) => ({
-  videoPlayer: {
+  mediaPlayer: {
+    isActive: false,
+    onlyAudio: false,
+  },
+  article: {
     isActive: false,
   },
+  articleLoading: false,
+  parsedArticle: null,
   notificaiton: {
     isShown: false,
     text: '',
@@ -62,9 +70,24 @@ const usePortalStore = create<PortalMainStore>((set) => ({
       refreshResultsPending: resultsPending,
     }));
   },
-  setVideo: (player: VideoPlayerType) => {
+  setParsedArticle: (item: ParsedArticle) => {
     set(() => ({
-      videoPlayer: player,
+      parsedArticle: item,
+    }));
+  },
+  setArticle: (item: ArticleType) => {
+    set(() => ({
+      article: item,
+    }));
+  },
+  setArticleLoading: (isLoading: boolean) => {
+    set(() => ({
+      articleLoading: isLoading,
+    }));
+  },
+  setMedia: (player: MediaPlayerType) => {
+    set(() => ({
+      mediaPlayer: player,
     }));
   },
   setNotification: (item: NotificationType) => {

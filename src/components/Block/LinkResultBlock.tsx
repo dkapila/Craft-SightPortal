@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 
 import usePortalStore from '../../store/store';
-import { PortalLinkResult, PortalResultBlock } from '../../Types';
+import { PortalLinkResult, PortalResultBlock, PortalMainStore } from '../../Types';
 import CraftAPIHelper from '../../api/craftAPIHelper';
 import ToggleStar from './Actions/ToggleStar';
-import { navigateToBlock, parseBlocks } from '../../utils/block';
+import { getYoutubeLink, navigateToBlock, parseBlocks } from '../../utils/block';
 
 const StyledTextContainer = styled.div`
   flex-grow: 1.1;
@@ -72,6 +72,7 @@ const LinkResultBlock = ({
   const [isInStarredBlockList, setIsInStarredBlockList] = useState(false);
   const starredBlocks = usePortalStore((state) => state.starredBlocks);
   const platformType = usePortalStore((state) => state.platformType);
+  const setMedia = usePortalStore((state: PortalMainStore) => state.setMedia);
 
   useEffect(() => {
     const inStarredBlocks = starredBlocks.some((item) => item.craftBlockId === blockResult.blockId);
@@ -104,6 +105,16 @@ const LinkResultBlock = ({
   };
 
   const openExternalLink = async (url: string) => {
+    const youtubeLink = getYoutubeLink([url]);
+    if (youtubeLink) {
+      setMedia({
+        isActive: true,
+        onlyAudio: false,
+        activeMediaUrl: (youtubeLink),
+      });
+
+      return;
+    }
     const result = await CraftAPIHelper.openURL(url);
     if (result.status !== 'success') {
       throw new Error(result.message);

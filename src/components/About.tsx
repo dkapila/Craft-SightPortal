@@ -5,6 +5,7 @@ import { animated, useSpring } from '@react-spring/web';
 import CraftAPIHelper from '../api/craftAPIHelper';
 import { VERSION } from '../config/config';
 import LabView from '../labs/components/LabView';
+import Constants from '../utils/constants';
 
 const StyledTextDiv = styled.div`
     color: ${(props) => props.theme.primaryTextColor};
@@ -31,7 +32,7 @@ const StyledFrameContainerDiv = styled.div`
 const StyledOverlayDiv = styled.div`
   background: transparent;
   position: absolute;
-  z-index: 10;
+  z-index: 1;
   height: 25px;
   width: 100%;
   cursor: pointer;
@@ -72,12 +73,15 @@ const About = () => {
         (beta)
       </StyledTextDiv>
       <StyledFrameContainerDiv>
-        <StyledOverlayDiv onClick={() => CraftAPIHelper.openUrl('https://dharam.is/Sight-Portal-Download')}>
+        <StyledOverlayDiv onClick={() => CraftAPIHelper.openUrl(
+          Constants.SIGHT_PORTAL_DOWNLOAD_LINK,
+        )}
+        >
           {
             (!iFrameLoaded) && <StyledTextDiv>Checking for updates...</StyledTextDiv>
           }
         </StyledOverlayDiv>
-        <StyledFrame frameBorder="0" onLoad={() => setIframeLoaded(true)} title="Sight Portal Updates" src="https://sightportal.dharamkapila.repl.co/Versions/0.3/0.3beta.html" />
+        <StyledFrame frameBorder="0" onLoad={() => setIframeLoaded(true)} src={Constants.SIGHT_PORTAL_UPDATE_STATUS_LINK} />
       </StyledFrameContainerDiv>
       <StyledHeader>
         Feedback 👋
@@ -85,7 +89,9 @@ const About = () => {
       <StyledTextDiv>
         Hi, I&apos;m
         {' '}
-        <StyledLinkDiv onClick={() => CraftAPIHelper.openUrl('https://dharam.is')}>Dharam</StyledLinkDiv>
+        <StyledLinkDiv onClick={() => CraftAPIHelper.openUrl(Constants.ABOUT_ME_LINK)}>
+          Dharam
+        </StyledLinkDiv>
         .
         {' '}
         Thank you for trying this extension :)
@@ -93,11 +99,21 @@ const About = () => {
       <StyledTextDiv>
         If you face any problems, or have suggestions, please contact me by
         {' '}
-        <StyledLinkDiv onClick={() => CraftAPIHelper.openUrl('mailto:dharam@hey.com')}>email</StyledLinkDiv>
+        <StyledLinkDiv onClick={
+          () => CraftAPIHelper.openUrl(Constants.MAIL_TO_LINK)
+        }
+        >
+          email
+        </StyledLinkDiv>
         {' '}
         or on
         {' '}
-        <StyledLinkDiv onClick={() => CraftAPIHelper.openUrl('https://www.twitter.com/dharamkapila')}>Twitter</StyledLinkDiv>
+        <StyledLinkDiv onClick={() => CraftAPIHelper.openUrl(
+          Constants.TWITTER_LINK,
+        )}
+        >
+          Twitter
+        </StyledLinkDiv>
         .
       </StyledTextDiv>
       <StyledHeader>
