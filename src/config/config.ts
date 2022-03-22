@@ -1,7 +1,6 @@
 import { SearchFiltersType } from '../Types';
 
-export const VERSION = '0.4';
-
+export const VERSION = '0.5';
 export const LOCAL_STORAGE_KEY = 'CraftSightPortal';
 
 export const defaultFilters: SearchFiltersType = {

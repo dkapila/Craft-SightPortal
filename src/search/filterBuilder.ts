@@ -107,6 +107,10 @@ class FilterBuilder {
 
   withLinkFilter(linkFilterOptions: LinkFilterOptionsType) {
     this.filteredBlocks = this.filteredBlocks.filter((block: PortalBlockType) => {
+      if ((<CraftUrl>block.craftBlock).url) {
+        return true;
+      }
+
       const links = (<CraftTextBlock>block.craftBlock).content
         .filter((item: CraftTextRun) => item.link).filter((item) => {
           if (!item.link) {
