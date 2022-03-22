@@ -1,4 +1,4 @@
-import { CraftTextBlock, CraftTextRun } from '@craftdocs/craft-extension-api';
+import { CraftTextBlock, CraftTextRun, CraftUrlBlock } from '@craftdocs/craft-extension-api';
 import { PortalBlockType, PortalLinkResult } from 'src/Types';
 
 class LinkResultsConverter {
@@ -12,6 +12,29 @@ class LinkResultsConverter {
     const results: PortalLinkResult[] = [];
 
     this.blocks.forEach((block) => {
+      if ((block.craftBlock as CraftUrlBlock).url) {
+        const { url } = block.craftBlock as CraftUrlBlock;
+        if (!url) {
+          return;
+        }
+
+        results.push({
+          portalBlock: block,
+          spaceId: block.spaceId,
+          id: block.id,
+          type: 'PortalLinkResult',
+          parentId: block.parentId,
+          level: block.level,
+          blockId: block.craftBlockId,
+          linkText: block.fullString,
+          link: { type: 'url', url },
+          preText: '',
+          postText: '',
+        });
+
+        return;
+      }
+
       const { content } = <CraftTextBlock>block.craftBlock;
 
       content.forEach((item: CraftTextRun) => {

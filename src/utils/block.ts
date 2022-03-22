@@ -32,6 +32,22 @@ export const parseBlocks = (
     }
   }
 
+  if (block.type === 'urlBlock' && block.url) {
+    const fullString = block.title ? block.title : block.url;
+
+    traversed_block_list.push({
+      craftBlockId: block.id,
+      textStyleType: 'body',
+      listStyleType: 'none',
+      id: uuidv4(),
+      spaceId: block.spaceId ? block.spaceId : '',
+      craftBlock: block,
+      fullString,
+      ...{ level },
+      parentId: parent_block_id,
+    });
+  }
+
   if (block.type === 'textBlock') {
     traversed_block_list.push({
       craftBlockId: block.id,
