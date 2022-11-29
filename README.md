@@ -4,7 +4,7 @@ A Craft Extension to explore and search your documents.
 
 ## Run this extension
 
-For instructions how to get started and use this extension, visit [Sight Portal](https://dharam.is/Sight-Portal).
+For instructions how to get started and use this extension, visit [Sight Portal](https://www.craft.do/s/X2sKIMMyDVq5X5/b/EB580047-B14F-4979-8A66-2FCC5FFDBC01/Craft_Extensions).
 
 ## Building
 
